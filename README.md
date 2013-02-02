@@ -68,6 +68,12 @@ Optional:
 - @user
 - #label
 
+#### Task "properties"
+
+- Task comments can also include properties. For instance, a due date property may be assigned like so: `This needs fixed quickly! due:1/31/13 #enterprise/4321`
+- Properties are arbitrary. 
+- Properties can contain letters, numbers, and/or underscores.
+
 #### Project Name and Task ID specifications
 
 - All 3 commands must include a project name and a task id in this format: `#project_name/task_id`. These two pieces together are what make up a unique ID for each task. Project names and task ids can consist of letters, numbers, and/or underscores. IDs cannot be considered to be globally unique, but should be sufficiently unique amongst a group. 
