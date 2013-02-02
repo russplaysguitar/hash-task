@@ -13,6 +13,14 @@ Make a comment: `This thing is really messed up #!4321`
 Assign a label via hash-tag: `This is definitely an #engine problem`  
 Close an issue: `it's finally fixed. let's fly. #!4321 #closed`  
 
+### API Client Specifications
+
+- The client application should only track issues which are discussed by people who the user follows (followees). 
+- Issue commands by followees are always accepted.
+- The most recent issue status (open, assign, or close) is the current issue status.
+- New issue labels (non-command hash-tags) by followees are always accepted. 
+- Comments by anyone referencing the issue (via ID) are added to the issue history.
+
 #### The 3 Commands:
 
 ##### #open
@@ -58,17 +66,8 @@ Optional:
 
 #### Task ID Requirements
 
-Task IDs begin with #! and can contain letters, numbers, and/or underscores. In regex terms: [A-Za-z0-9_]+
-
-### API Client Specifications
-
-- The client application should only track issues which are discussed by people who the user follows (followees). 
-- Issue commands by followees are always accepted.
-- The most recent issue status (open, assign, or close) is the current issue status.
-- New issue labels (non-command hash-tags) by followees are always accepted. 
-- Comments by anyone referencing the issue (via ID) are added to the issue history.
+- Task IDs begin with #! and can contain letters, numbers, and/or underscores. In regex terms: [A-Za-z0-9_]+
 
 ### Social Networking System Requirements
 
 - The entire status update history for all users must be available. This is necessary to track issue history.
-
