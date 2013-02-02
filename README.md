@@ -11,11 +11,11 @@ Commands for managing tasks are sent out as "status updates" over an existing so
 
 #### Basic Usage:
 
-Open an issue: `The warp-drive is not working #enterprise/4321 #open`  
-Assign an issue: `@geordi can you fix this? #enterprise/4321 #assign`  
+Open a task: `The warp-drive is not working #enterprise/4321 #open`  
+Assign an task: `@geordi can you fix this? #enterprise/4321 #assign`  
 Make a comment: `Fix in progress... #enterprise/4321`  
 Assign a label via hash-tag: `It seems to be a problem with #antimatter #enterprise/4321`  
-Close an issue: `Warp-drive is back online. Engage. #enterprise/4321 #close`  
+Close an task: `Warp-drive is back online. Engage. #enterprise/4321 #close`  
 
 ### API Client Specifications
 
