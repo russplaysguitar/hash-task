@@ -1,9 +1,13 @@
 todo-tent
 =========
 
-A social task management system built on Tent.io. Utilizes existing status update conventions to define an API for which to manage tasks from within a social networking environment. 
+A social task management system built on Tent.io. Utilizes existing "status update" conventions to define an API for which to manage tasks from within a social networking environment. 
 
-### The API
+### Architecture
+
+Commands for managing tasks are sent out as "status updates" over an existing social network. These are written in a human-readable format. Client applications can be used to collect task history, determine the current issue status, and send task management commands.
+
+### The Social API
 
 #### Basic Usage:
 
