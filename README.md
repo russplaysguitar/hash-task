@@ -23,7 +23,9 @@ Required:
 2. Title 
 
 Optional: 
-- 
+
+- @user
+- #label
 
 ##### #assign
 
@@ -32,8 +34,18 @@ Required:
 1. #!task_id
 2. @user
 
+Optional:
+
+- comment
+- #label
+
 ##### #close
 
 Required:  
 
 1. #!task_id
+
+Optional:
+
+- @user
+- #label
