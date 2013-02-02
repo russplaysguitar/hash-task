@@ -11,17 +11,17 @@ Commands for managing tasks are sent out as "status updates" over an existing so
 
 #### Basic Usage:
 
-Open an issue: `The spaceship is broken #!4321 #opened`  
-Assign an issue: `@joe can you fix it? #!4321 #assigned`  
-Make a comment: `This thing is really messed up #!4321`  
-Assign a label via hash-tag: `This is definitely an #engine problem`  
-Close an issue: `it's finally fixed. let's fly. #!4321 #closed`  
+Open an issue: `The warp-drive is not working #enterprise/4321 #open`  
+Assign an issue: `@geordi can you fix this? #enterprise/4321 #assign`  
+Make a comment: `Fix in progress... #enterprise/4321`  
+Assign a label via hash-tag: `It seems to be a problem with #antimatter #enterprise/4321`  
+Close an issue: `Warp-drive is back online. Engage. #enterprise/4321 #close`  
 
 ### API Client Specifications
 
 - The client application should only track issues which are discussed by people who the user follows (followees). 
-- Issue commands by followees are always accepted.
-- The most recent issue status (open, assign, or close) is the current issue status.
+- Commands by followees are always accepted.
+- The most recent task status (open, assign, or close) is the current status of that task.
 - New issue labels (non-command hash-tags) by followees are always accepted. 
 - Comments by anyone referencing the issue (via ID) are added to the issue history.
 
@@ -33,7 +33,7 @@ Close an issue: `it's finally fixed. let's fly. #!4321 #closed`
 
 Required:  
 
-1. #!task_id
+1. #project_name/task_id
 2. Title 
 
 Optional: 
@@ -47,7 +47,7 @@ Optional:
 
 Required:  
 
-1. #!task_id
+1. #project_name/task_id
 2. @user
 
 Optional:
@@ -61,16 +61,16 @@ Optional:
 
 Required:  
 
-1. #!task_id
+1. #project_name/task_id
 
 Optional:
 
 - @user
 - #label
 
-#### Task ID Requirements
+#### Project Name and Task ID specifications
 
-- Task IDs begin with #! and can contain letters, numbers, and/or underscores. In regex terms: [A-Za-z0-9_]+
+- All 3 commands must include a project name and a task id in this format: `#project_name/task_id`. These two pieces together are what make up a unique ID for each task. Project names and task ids can consist of letters, numbers, and/or underscores. IDs cannot be considered to be globally unique, but should be sufficiently unique amongst a group. 
 
 ### Social Networking System Requirements
 
