@@ -1,11 +1,18 @@
 todo-tent
 =========
 
-A social task management system built on Tent.io. Utilizes existing "status update" conventions to define an API for which to manage tasks from within a social networking environment. 
+A task management system built on status updates from social networking systems (like Twitter or Tent.io). Utilizes existing conventions to define a human-readable syntax for which to manage tasks from within a social networking environment. 
 
 ### Architecture
 
-Commands for managing tasks are sent out as "status updates" over an existing social network. These are written in a human-readable format. Client applications can be used to collect task history, determine the current issue status, and send task management commands.
+Tasks are managed by updating their status (open, assigned, or closed) and making comments about them via an existing social network.  
+The client application is a layer of abstraction on top of this. Task activity streams can be viewed from within the application, and task changes from within the application result in posts on the social network.
+
+##### Benefits
+
+- Task management occurs in a social environment
+- People on the social network can follow task histories with or without an application
+- Third-party developers can create new applications that use the same task management syntax.
 
 ### The Social API
 
@@ -72,12 +79,12 @@ Optional:
 
 - Task comments can also include properties. For instance, a due date property may be assigned like so: `This needs fixed quickly! due:1/31/13 #enterprise/4321`
 - Properties are arbitrary. 
-- Properties can contain letters, numbers, and/or underscores.
+- Properties can contain any non-whitespace characters.
 
-#### Project Name and Task ID specifications
+#### Unique ID specifications
 
 - All 3 commands must include a project name and a task id in this format: `#project_name/task_id`. These two pieces together are what make up a unique ID for each task. Project names and task ids can consist of letters, numbers, and/or underscores. IDs cannot be considered to be globally unique, but should be sufficiently unique amongst a group. 
 
 ### Social Networking System Requirements
 
-- The entire status update history for all users must be available. This is necessary to track issue history.
+- The entire status update history for all users must be available and searchable. This is necessary to track issue history.
