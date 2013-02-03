@@ -1,7 +1,7 @@
 hash-task
 =========
 
-A task management system built on status updates from social networking systems (like Twitter or Tent.io). Utilizes existing conventions to define a human-readable syntax for which to manage tasks from within a social networking environment. 
+A decentralized task management system built on status updates from social networking systems (like Twitter or Tent.io). Utilizes hashtags to define a human-readable syntax for which to manage tasks from within a social networking environment. 
 
 ### Architecture
 
