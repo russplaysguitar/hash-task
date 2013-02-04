@@ -6,7 +6,8 @@ A decentralized task management system built on status updates from social netwo
 ### Architecture
 
 Tasks are managed by updating their status (open, assigned, or closed) and making comments about them via an existing social network.  
-The client application is a layer of abstraction on top of this. Task activity streams can be viewed from within the application, and task changes from within the application result in posts on the social network.
+The client application is a layer of abstraction on top of this. Task activity streams can be viewed from within the application, and task changes from within the application result in posts on the social network.  
+See the [client application mock-ups](https://moqups.com/moqupsruss/XQGInmsT/p:a3907ed67).
 
 ##### Benefits
 
