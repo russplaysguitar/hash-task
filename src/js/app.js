@@ -1,14 +1,8 @@
-/*global Backbone,_*/
+/*global Backbone,_,$*/
 (function () {
     'use strict';
 
-    // TODO:
-    /*
-        - project model
-        - task model
-        - user model
-    */
-
+    // represents a single post
     var PostModel = Backbone.Model.extend({
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
         statusPattern: /\#(open|assign|close)/i,
@@ -40,6 +34,7 @@
         }
     });
 
+    // represents a collection of posts
     var PostCollection = Backbone.Collection.extend({
         model: PostModel,
         url: 'https://russ.tent.is/tent/posts',
@@ -70,20 +65,46 @@
         }
     });
 
-    var ProjectModel = Backbone.Model.extend({
-        initialize: function (posts) {
-            var pc = new PostCollection(posts);
-            this.set('tasks', pc.groupBy('task'));
-            this.set('users', pc.groupBy('user'));
-            this.set('posts', pc);
-            // this.set('labels', pc.groupBy());// TODO
+    var postsCollection = new PostCollection();
+
+    // not sure if this should be broken out into multiple views...
+    var ProjectsView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'project',
+        events: {
+            'click .name': 'showProject'
+        },
+        showProject: function (evt) {
+            var project = evt.currentTarget.hash;
+            var projects = this.collection.filter(function (post) {
+                return post.get('project') == project.substring(1, project.length);
+            });
+            _.each(projects, function (post) {
+                this.$el.append(post.get('content').text);
+            }, this);
+        },
+        initialize: function () {
+            var self = this;
+            this.collection.fetch({
+                success: function () {
+                    self.render();
+                }
+            });
+        },
+        render: function () {
+            var self = this;
+            var projectNames = _.keys(this.collection.groupBy('project'));
+
+            _.each(projectNames, function (name) {
+                self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
+            });
 
         }
     });
 
-    var postsCollection = new PostCollection();
+    var pView = new ProjectsView({collection: postsCollection});
 
-    postsCollection.fetch();
+    $('html').append(pView.$el);
 
     // var postsWithTasks = _.filter(posts, function (post) {
     //     return post.type == "https://tent.io/types/post/status/v0.1.0" && PostModel.prototype.taskPattern.test(post.content.text);
