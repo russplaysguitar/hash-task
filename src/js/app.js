@@ -1,3 +1,6 @@
+/*global Backbone,_*/
+
+'use strict';
 
 // TODO:
 /*
@@ -6,28 +9,16 @@
     - user model
 */
 
-
-var ProjectModel = Backbone.Model.extend({
-    initialize: function (posts) {
-        var pc = new PostCollection(posts);
-        this.set('tasks', pc.groupBy('task'));
-        this.set('users', pc.groupBy('user'));
-        this.set('posts', pc);
-        // this.set('labels', pc.groupBy());// TODO
-
-    }
-});
-
 var PostModel = Backbone.Model.extend({
     taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
     statusPattern: /\#(open|assign|close)/i,
     labelPattern: /\#([\w_\d]+)/gi,
     parse: function (post) {
-        var text = post.content.text;
+        var text = post.content.text,
+            taskMatches = this.taskPattern.exec(text),
+            project = taskMatches ? taskMatches[1] : null,
+            task = taskMatches ? taskMatches[2]: null;
 
-        var taskMatches = this.taskPattern.exec(text);
-        var project = taskMatches ? taskMatches[1] : null;
-        var task = taskMatches ? taskMatches[2]: null;
         this.set('project', project);
         this.set('task', task);
 
@@ -69,13 +60,24 @@ var PostCollection = Backbone.Collection.extend({
 
         // only put status posts into the collection
         return _.filter(json, function (post) {
-            return post.type == "https://tent.io/types/post/status/v0.1.0";
+            return post.type === 'https://tent.io/types/post/status/v0.1.0';
         });
     },
     byTaskForProject: function (projectName) {// useful??
         return _.groupBy(this.groupBy('project')[projectName], function (model) {
             return model.get('task');
         }, this);
+    }
+});
+
+var ProjectModel = Backbone.Model.extend({
+    initialize: function (posts) {
+        var pc = new PostCollection(posts);
+        this.set('tasks', pc.groupBy('task'));
+        this.set('users', pc.groupBy('user'));
+        this.set('posts', pc);
+        // this.set('labels', pc.groupBy());// TODO
+
     }
 });
 
@@ -87,9 +89,9 @@ postsCollection.fetch();
 //     return post.type == "https://tent.io/types/post/status/v0.1.0" && PostModel.prototype.taskPattern.test(post.content.text);
 // });
 
-// var wpPostsCollection = new PostCollection(postsCollection.filter(function(v){
-//     return v.get('project') == 'Wordpress';
+// var seniorProjectCollection = new PostCollection(postsCollection.filter(function(v){
+//     return v.get('project') == 'senior_project';
 // }));
 
-// var project = new ProjectModel(wpPostsCollection);
+// var project = new ProjectModel(seniorProjectCollection);
 
