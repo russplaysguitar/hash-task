@@ -91,7 +91,7 @@
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
             _.each(projectNames, function (name) {
-                self.$el.append('<a href="#"' + name + ' class="name">' + name + '</a><br />');
+                self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
             });
 
             router.navigate('');// just save this place
