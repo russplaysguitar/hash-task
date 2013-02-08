@@ -55,11 +55,17 @@ module.exports = function(grunt) {
       },
       globals: {}
     },
-    uglify: {}
+    uglify: {},
+    server: {
+      port: 8000,
+      base: 'src/'
+    }
   });
 
   grunt.loadNpmTasks('grunt-growl');
   grunt.loadNpmTasks('grunt-jasmine-runner');
+
+  grunt.registerTask("run", "server watch");
 
   // Default task.
   grunt.registerTask('default', 'lint jasmine concat min');
