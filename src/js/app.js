@@ -91,7 +91,7 @@
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
             _.each(projectNames, function (name) {
-                self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
+                self.$el.append('<a href="#"' + name + ' class="name">' + name + '</a><br />');
             });
 
             router.navigate('');// just save this place
@@ -102,9 +102,9 @@
 
     var Router = Backbone.Router.extend({
         routes: {
-            "": "home",
-            ":project": "project",
-            ":project/:task": "task"
+            '': 'home',
+            ':project': 'project',
+            ':project/:task': 'task'
         },
         home: function () {
             $('html').html(pView.$el);
@@ -126,7 +126,7 @@
     Backbone.history.start();
 
     // var postsWithTasks = _.filter(posts, function (post) {
-    //     return post.type == "https://tent.io/types/post/status/v0.1.0" && PostModel.prototype.taskPattern.test(post.content.text);
+    //     return post.type == 'https://tent.io/types/post/status/v0.1.0' && PostModel.prototype.taskPattern.test(post.content.text);
     // });
 
     // var seniorProjectCollection = new PostCollection(postsCollection.filter(function(v){
