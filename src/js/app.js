@@ -76,12 +76,7 @@
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
-            var projects = this.collection.filter(function (post) {
-                return post.get('project') == project.substring(1, project.length);
-            });
-            _.each(projects, function (post) {
-                this.$el.append(post.get('content').text);
-            }, this);
+            router.navigate(project, {trigger:true});
         },
         initialize: function () {
             var self = this;
@@ -93,18 +88,42 @@
         },
         render: function () {
             var self = this;
-            var projectNames = _.keys(this.collection.groupBy('project'));
+            var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
             _.each(projectNames, function (name) {
                 self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
             });
 
+            router.navigate('');// just save this place
         }
     });
 
     var pView = new ProjectsView({collection: postsCollection});
 
-    $('html').append(pView.$el);
+    var Router = Backbone.Router.extend({
+        routes: {
+            "": "home",
+            ":project": "project",
+            ":project/:task": "task"
+        },
+        home: function () {
+            $('html').html(pView.$el);
+        },
+        project: function (project) {
+            var projects = pView.collection.filter(function (post) {
+                return post.get('project') === project;
+            });
+            _.each(projects, function (post) {
+                pView.$el.append(post.get('content').text + '<br />');
+            });
+            $('html').html(pView.$el);
+        },
+        task: function (project, task) {
+            // debugger;
+        }
+    });
+    var router = new Router();
+    Backbone.history.start();
 
     // var postsWithTasks = _.filter(posts, function (post) {
     //     return post.type == "https://tent.io/types/post/status/v0.1.0" && PostModel.prototype.taskPattern.test(post.content.text);
