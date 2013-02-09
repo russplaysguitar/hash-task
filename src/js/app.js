@@ -171,10 +171,13 @@
         },
         home: function () {
             $('#projectsList').html(projectsView.render());
+            $('#tasksList').html('');
+            $('#postsList').html('');
         },
         project: function (project) {
             $('#projectsList').html(projectsView.render());
             $('#tasksList').html(tasksView.render(project));
+            $('#postsList').html('');
         },
         task: function (project, task) {
             $('#projectsList').html(projectsView.render());
@@ -182,35 +185,35 @@
             $('#postsList').html(postsView.render(task));
         }
     });
+    var router = new Router();
 
     var postsCollection = new PostCollection();
     postsCollection.url = 'https://russ.tent.is/tent/posts';
+    postsCollection.fetch();
 
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
     var postsView = new PostsView({collection: postsCollection});
 
-    var router = new Router();
-
-    postsCollection.fetch({
-        success: function () {
-            Backbone.history.start();
-        }
-    });
-
     var followingsCollection = new Backbone.Collection();
     followingsCollection.url = 'https://russ.tent.is/tent/followings';
     followingsCollection.fetch({
         success: function (collection) {
+            var pendingSyncs = 0;
             // fetch posts for each entity this user is following
             collection.each(function (following) {
                 var entity = following.get('entity');
                 var followingPosts = new PostCollection();
                 followingPosts.url = entity + '/tent/posts';
+                pendingSyncs++;
                 followingPosts.fetch({
                     success: function (fpCollection) {
-                        // add the posts to the 
+                        // add the new posts to the main posts collection
                         postsCollection.add(fpCollection.models);
+                        pendingSyncs--;
+                        if (!pendingSyncs) {
+                            Backbone.history.start();
+                        }
                     }
                 });
             });
