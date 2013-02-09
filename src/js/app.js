@@ -37,7 +37,6 @@
     // represents a collection of posts
     var PostCollection = Backbone.Collection.extend({
         model: PostModel,
-        url: 'https://russ.tent.is/tent/posts',
         parse: function (json) {
             // find labels that reference projects (for posts without explicit project references)
             _.defer(_.bind(function () {
@@ -64,7 +63,6 @@
             }, this);
         }
     });
-
 
     // a list of tasks for a given project
     var TasksView = Backbone.View.extend({
@@ -103,12 +101,15 @@
 
     // a single post
     var PostView = Backbone.View.extend({
-        tagName: 'p',
-        className: 'lead',
+        tagName: 'blockquote',
+        className: 'post',
         render: function () {
             this.$el.html('');
-            var template = _.template('<%= text %>');
-            this.$el.html(template({text: this.model.get('content').text}));
+            var template = _.template('<p><%= text %></p><small><%= user %></small>');
+            this.$el.html(template({
+                text: this.model.get('content').text,
+                user: this.model.get('user')
+            }));
 
             return this.$el;
         }
@@ -183,6 +184,7 @@
     });
 
     var postsCollection = new PostCollection();
+    postsCollection.url = 'https://russ.tent.is/tent/posts';
 
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
@@ -193,6 +195,25 @@
     postsCollection.fetch({
         success: function () {
             Backbone.history.start();
+        }
+    });
+
+    var followingsCollection = new Backbone.Collection();
+    followingsCollection.url = 'https://russ.tent.is/tent/followings';
+    followingsCollection.fetch({
+        success: function (collection) {
+            // fetch posts for each entity this user is following
+            collection.each(function (following) {
+                var entity = following.get('entity');
+                var followingPosts = new PostCollection();
+                followingPosts.url = entity + '/tent/posts';
+                followingPosts.fetch({
+                    success: function (fpCollection) {
+                        // add the posts to the 
+                        postsCollection.add(fpCollection.models);
+                    }
+                });
+            });
         }
     });
 
