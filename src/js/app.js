@@ -103,26 +103,18 @@
             var posts = this.collection.filter(function (post) {
                 return post.get('task') === task;
             });
-            
+
             _.each(posts, function (post) {
                 this.$el.append(post.get('content').text + '<br />');
             }, this);
         }
     });
 
-    var MenuView = Backbone.View.extend({
+    var ProjectsMenuView = Backbone.View.extend({
         tagName: 'div',
         className: 'menu',
         events: {
             'click .name': 'showProject'
-        },
-        initialize: function () {
-            var self = this;
-            this.collection.fetch({
-                success: function () {
-                    self.render();
-                }
-            });
         },
         render: function () {
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
@@ -132,7 +124,7 @@
                 this.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
             }, this);
 
-            router.navigate('');// just save this place
+            // router.navigate('');// just save this place
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
@@ -147,29 +139,38 @@
             ':project/:task': 'task'
         },
         home: function () {
-            $('html').html(menuView.$el);
+            menuView.render();
+            $('#content').html(menuView.$el);
         },
         project: function (project) {
-            $('html').html(menuView.$el);
+            menuView.render();
+            $('#content').html(menuView.$el);
             pView.render(project);
-            $('html').append(pView.$el);
+            $('#content').append(pView.$el);
         },
         task: function (project, task) {
-            $('html').html(menuView.$el);
-            $('html').append(pView.$el);
+            menuView.render();
+            $('#content').html(menuView.$el);
+            pView.render(project);
+            $('#content').append(pView.$el);
             tView.render(task);
-            $('html').append(tView.$el);
+            $('#content').append(tView.$el);
         }
     });
 
     var postsCollection = new PostCollection();
-    var menuView = new MenuView({collection: postsCollection});
+    var menuView = new ProjectsMenuView({collection: postsCollection});
     var tView = new TasksView({collection: postsCollection});
     var pView = new ProjectsView({collection: postsCollection});    
 
     var router = new Router();
-    Backbone.history.start();
 
+    postsCollection.fetch({
+        success: function () {
+            Backbone.history.start();
+            // router.navigate('', {trigger: true});
+        }
+    });
 
     // var postsWithTasks = _.filter(posts, function (post) {
     //     return post.type == 'https://tent.io/types/post/status/v0.1.0' && PostModel.prototype.taskPattern.test(post.content.text);
