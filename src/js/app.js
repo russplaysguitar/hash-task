@@ -65,11 +65,13 @@
         }
     });
 
-    var ProjectsView = Backbone.View.extend({
+
+    // a list of tasks for a given project
+    var TasksView = Backbone.View.extend({
         tagName: 'div',
         className: 'project',
         events: {
-            'click .taskName': 'showTask'
+            'click .btn': 'showTask'
         },
         render: function (project) {
             this.$el.html('');
@@ -88,7 +90,7 @@
             _.each(tasks, function (task) {
                 locParts[1] = task;
                 var location = locParts.join('/');
-                this.$el.append('<a href="' + location + '" class="' + task + '">' + task + '</a><br />');
+                this.$el.append('<a href="' + location + '" class="btn btn-success">' + task + '</a> ');
             }, this);
         },
         showTask: function () {
@@ -97,7 +99,8 @@
         }
     });
 
-    var TasksView = Backbone.View.extend({
+    // a list of posts for a given task
+    var PostsView = Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
         render: function (task) {
@@ -108,23 +111,24 @@
             });
 
             _.each(posts, function (post) {
-                this.$el.append(post.get('content').text + '<br />');
+                this.$el.append('<p class="lead">' + post.get('content').text + '</p>');
             }, this);
         }
     });
 
-    var ProjectsMenuView = Backbone.View.extend({
+    // a list of projects
+    var ProjectsView = Backbone.View.extend({
         tagName: 'div',
         className: 'menu',
         events: {
-            'click .name': 'showProject'
+            'click .btn': 'showProject'
         },
         render: function () {
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
             this.$el.html('');
             _.each(projectNames, function (name) {
-                this.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
+                this.$el.append('<a href="#' + name + '" class="btn btn-primary">' + name + '</a> ');
             }, this);
         },
         showProject: function (evt) {
@@ -132,6 +136,7 @@
             router.navigate(project, {trigger:true});
         }        
     });
+
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -160,9 +165,10 @@
     });
 
     var postsCollection = new PostCollection();
-    var menuView = new ProjectsMenuView({collection: postsCollection});
-    var tView = new TasksView({collection: postsCollection});
-    var pView = new ProjectsView({collection: postsCollection});    
+    
+    var menuView = new ProjectsView({collection: postsCollection});
+    var tView = new PostsView({collection: postsCollection});
+    var pView = new TasksView({collection: postsCollection});    
 
     var router = new Router();
 
