@@ -81,7 +81,7 @@
             });
 
             // get tasks for project
-            var tasks = _.without(_.keys(_.groupBy(posts, function (post) { 
+            var tasks = _.without(_.keys(_.groupBy(posts, function (post) {
                 return post.get('task'); })), 'null');
 
             // update DOM
@@ -101,6 +101,19 @@
         }
     });
 
+    // a single post
+    var PostView = Backbone.View.extend({
+        tagName: 'p',
+        className: 'lead',
+        render: function () {
+            this.$el.html('');
+            var template = _.template('<%= text %>');
+            this.$el.html(template({text: this.model.get('content').text}));
+
+            return this.$el;
+        }
+    });
+
     // a list of posts for a given task
     var PostsView = Backbone.View.extend({
         tagName: 'div',
@@ -113,9 +126,9 @@
 
             // update DOM
             this.$el.html('');
-            var template = _.template('<p class="lead"><%= text %></p>');
             _.each(posts, function (post) {
-                this.$el.append(template({text: post.get('content').text}));
+                var postView = new PostView({model: post});
+                this.$el.append(postView.render());
             }, this);
 
             return this.$el;
@@ -145,7 +158,7 @@
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
             router.navigate(project, {trigger:true});
-        }        
+        }
     });
 
 
@@ -172,7 +185,7 @@
     var postsCollection = new PostCollection();
 
     var projectsView = new ProjectsView({collection: postsCollection});
-    var tasksView = new TasksView({collection: postsCollection});    
+    var tasksView = new TasksView({collection: postsCollection});
     var postsView = new PostsView({collection: postsCollection});
 
     var router = new Router();
