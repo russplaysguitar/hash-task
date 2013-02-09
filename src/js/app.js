@@ -74,7 +74,6 @@
             'click .btn': 'showTask'
         },
         render: function (project) {
-            this.$el.html('');
 
             // get posts for project
             var posts = this.collection.filter(function (post) {
@@ -85,7 +84,8 @@
             var tasks = _.without(_.keys(_.groupBy(posts, function (post) { 
                 return post.get('task'); })), 'null');
 
-            // append tasks to this
+            // update DOM
+            this.$el.html('');
             var template = _.template('<a href="<%= location %>" class="btn btn-success"><%= task %></a> ');
             var locParts = document.location.hash.split('/');
             _.each(tasks, function (task) {
@@ -106,12 +106,13 @@
         tagName: 'div',
         className: 'tasks',
         render: function (task) {
-            this.$el.html('');
-
+            // get posts for task
             var posts = this.collection.filter(function (post) {
                 return post.get('task') === task;
             });
 
+            // update DOM
+            this.$el.html('');
             var template = _.template('<p class="lead"><%= text %></p>');
             _.each(posts, function (post) {
                 this.$el.append(template({text: post.get('content').text}));
@@ -129,11 +130,12 @@
             'click .btn': 'showProject'
         },
         render: function () {
-            this.$el.html('');
-
+            // get list of project names
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
-            var template = _.template('<a href="#<%= name %>" class="btn btn-primary"><%= name %></a>');
+            // update DOM
+            this.$el.html('');
+            var template = _.template('<a href="#<%= name %>" class="btn btn-primary"><%= name %></a> ');
             _.each(projectNames, function (name) {
                 this.$el.append(template({name: name}));
             }, this);
