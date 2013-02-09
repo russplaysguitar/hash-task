@@ -32,7 +32,7 @@ Tasks which are intended only for the user who opens them can use a short-hand s
 
 Tasks created using this syntax will automatically be opened and assigned to the user who posts it with the project name being that user's name.
 
-For example, a status update from Joe: `#/groceries Need to buy food on Tues` results in a new project named `Joe` and a new task named `groceries` which has been assigned to Joe. 
+For example, a status update from Joe: `#/groceries Need to buy food on Tues` results in a new project named `Joe` and a new task named `groceries` which has been assigned to Joe. If other users wish to reference this task, they would use the ID: `#joe/groceries`
 
 ### API Client Specifications
 
