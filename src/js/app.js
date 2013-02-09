@@ -152,24 +152,24 @@
             ':project/:task': 'task'
         },
         home: function () {
-            $('#projectsList').html(menuView.render());
+            $('#projectsList').html(projectsView.render());
         },
         project: function (project) {
-            $('#projectsList').html(menuView.render());
-            $('#tasksList').html(pView.render(project));
+            $('#projectsList').html(projectsView.render());
+            $('#tasksList').html(tasksView.render(project));
         },
         task: function (project, task) {
-            $('#projectsList').html(menuView.render());
-            $('#tasksList').html(pView.render(project));
-            $('#postsList').html(tView.render(task));
+            $('#projectsList').html(projectsView.render());
+            $('#tasksList').html(tasksView.render(project));
+            $('#postsList').html(postsView.render(task));
         }
     });
 
     var postsCollection = new PostCollection();
 
-    var menuView = new ProjectsView({collection: postsCollection});
-    var tView = new PostsView({collection: postsCollection});
-    var pView = new TasksView({collection: postsCollection});    
+    var projectsView = new ProjectsView({collection: postsCollection});
+    var tasksView = new TasksView({collection: postsCollection});    
+    var postsView = new PostsView({collection: postsCollection});
 
     var router = new Router();
 
