@@ -65,18 +65,46 @@
         }
     });
 
-    var postsCollection = new PostCollection();
-
-    // not sure if this should be broken out into multiple views...
     var ProjectsView = Backbone.View.extend({
         tagName: 'div',
         className: 'project',
+        events: {
+            'click .taskName': 'showTask'
+        },
         render: function (project) {
             this.$el.html('');
-            var projects = this.collection.filter(function (post) {
+
+            // get posts for project
+            var posts = this.collection.filter(function (post) {
                 return post.get('project') === project;
             });
-            _.each(projects, function (post) {
+
+            // get tasks for project
+            var tasks = _.keys(_.groupBy(posts, function (post) { return post.get('task'); }));
+            var tasks = _.without(tasks, 'null');
+
+            // append tasks to this
+            _.each(tasks, function (task) {
+                this.$el.append('<a href="' + document.location.hash + '/' + task + '" class="' + task + '">' + task + '</a><br />');
+            }, this);
+        },
+        showTask: function () {
+            var location = evt.currentTarget.hash;
+            router.navigate(location, {trigger:true});
+        }
+    });
+
+    var TasksView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'tasks',
+        render: function (task) {
+            this.$el.html('');
+
+            var posts = this.collection.filter(function (post) {
+                return post.get('task') === task;
+            });
+            
+            _.each(posts, function (post) {
                 this.$el.append(post.get('content').text + '<br />');
             }, this);
         }
@@ -97,13 +125,12 @@
             });
         },
         render: function () {
-            var self = this;
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
-            self.$el.html('');
+            this.$el.html('');
             _.each(projectNames, function (name) {
-                self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
-            });
+                this.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
+            }, this);
 
             router.navigate('');// just save this place
         },
@@ -112,7 +139,6 @@
             router.navigate(project, {trigger:true});
         }        
     });
-
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -129,11 +155,16 @@
             $('html').append(pView.$el);
         },
         task: function (project, task) {
-            // debugger;
+            $('html').html(menuView.$el);
+            $('html').append(pView.$el);
+            tView.render(task);
+            $('html').append(tView.$el);
         }
     });
 
+    var postsCollection = new PostCollection();
     var menuView = new MenuView({collection: postsCollection});
+    var tView = new TasksView({collection: postsCollection});
     var pView = new ProjectsView({collection: postsCollection});    
 
     var router = new Router();
