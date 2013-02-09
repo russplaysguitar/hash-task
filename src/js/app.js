@@ -84,8 +84,11 @@
             var tasks = _.without(tasks, 'null');
 
             // append tasks to this
+            var locParts = document.location.hash.split('/');
             _.each(tasks, function (task) {
-                this.$el.append('<a href="' + document.location.hash + '/' + task + '" class="' + task + '">' + task + '</a><br />');
+                locParts[1] = task;
+                var location = locParts.join('/');
+                this.$el.append('<a href="' + location + '" class="' + task + '">' + task + '</a><br />');
             }, this);
         },
         showTask: function () {
@@ -123,8 +126,6 @@
             _.each(projectNames, function (name) {
                 this.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
             }, this);
-
-            // router.navigate('');// just save this place
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
@@ -168,7 +169,6 @@
     postsCollection.fetch({
         success: function () {
             Backbone.history.start();
-            // router.navigate('', {trigger: true});
         }
     });
 
