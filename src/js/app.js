@@ -92,6 +92,8 @@
                 var location = locParts.join('/');
                 this.$el.append('<a href="' + location + '" class="btn btn-success">' + task + '</a> ');
             }, this);
+
+            return this.$el.html();
         },
         showTask: function () {
             var location = evt.currentTarget.hash;
@@ -113,6 +115,8 @@
             _.each(posts, function (post) {
                 this.$el.append('<p class="lead">' + post.get('content').text + '</p>');
             }, this);
+
+            return this.$el.html();
         }
     });
 
@@ -124,12 +128,15 @@
             'click .btn': 'showProject'
         },
         render: function () {
+            this.$el.html('');
+            
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
-            this.$el.html('');
             _.each(projectNames, function (name) {
                 this.$el.append('<a href="#' + name + '" class="btn btn-primary">' + name + '</a> ');
             }, this);
+
+            return this.$el.html();
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
@@ -145,27 +152,21 @@
             ':project/:task': 'task'
         },
         home: function () {
-            menuView.render();
-            $('#content').html(menuView.$el);
+            $('#projectsList').html(menuView.render());
         },
         project: function (project) {
-            menuView.render();
-            $('#content').html(menuView.$el);
-            pView.render(project);
-            $('#content').append(pView.$el);
+            $('#projectsList').html(menuView.render());
+            $('#tasksList').html(pView.render(project));
         },
         task: function (project, task) {
-            menuView.render();
-            $('#content').html(menuView.$el);
-            pView.render(project);
-            $('#content').append(pView.$el);
-            tView.render(task);
-            $('#content').append(tView.$el);
+            $('#projectsList').html(menuView.render());
+            $('#tasksList').html(pView.render(project));
+            $('#postsList').html(tView.render(task));
         }
     });
 
     var postsCollection = new PostCollection();
-    
+
     var menuView = new ProjectsView({collection: postsCollection});
     var tView = new PostsView({collection: postsCollection});
     var pView = new TasksView({collection: postsCollection});    
