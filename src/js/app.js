@@ -82,18 +82,18 @@
             });
 
             // get tasks for project
-            var tasks = _.keys(_.groupBy(posts, function (post) { return post.get('task'); }));
-            var tasks = _.without(tasks, 'null');
+            var tasks = _.without(_.keys(_.groupBy(posts, function (post) { 
+                return post.get('task'); })), 'null');
 
             // append tasks to this
+            var template = _.template('<a href="<%= location %>" class="btn btn-success"><%= task %></a> ');
             var locParts = document.location.hash.split('/');
             _.each(tasks, function (task) {
                 locParts[1] = task;
-                var location = locParts.join('/');
-                this.$el.append('<a href="' + location + '" class="btn btn-success">' + task + '</a> ');
+                this.$el.append(template({location: locParts.join('/'), task: task}));
             }, this);
 
-            return this.$el.html();
+            return this.$el;
         },
         showTask: function () {
             var location = evt.currentTarget.hash;
@@ -112,11 +112,12 @@
                 return post.get('task') === task;
             });
 
+            var template = _.template('<p class="lead"><%= text %></p>');
             _.each(posts, function (post) {
-                this.$el.append('<p class="lead">' + post.get('content').text + '</p>');
+                this.$el.append(template({text: post.get('content').text}));
             }, this);
 
-            return this.$el.html();
+            return this.$el;
         }
     });
 
@@ -129,14 +130,15 @@
         },
         render: function () {
             this.$el.html('');
-            
+
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
+            var template = _.template('<a href="#<%= name %>" class="btn btn-primary"><%= name %></a>');
             _.each(projectNames, function (name) {
-                this.$el.append('<a href="#' + name + '" class="btn btn-primary">' + name + '</a> ');
+                this.$el.append(template({name: name}));
             }, this);
 
-            return this.$el.html();
+            return this.$el;
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
