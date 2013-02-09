@@ -95,7 +95,7 @@
 
             return this.$el;
         },
-        showTask: function () {
+        showTask: function (evt) {
             var location = evt.currentTarget.hash;
             router.navigate(location, {trigger:true});
         }
