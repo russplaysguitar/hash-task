@@ -71,12 +71,22 @@
     var ProjectsView = Backbone.View.extend({
         tagName: 'div',
         className: 'project',
+        render: function (project) {
+            this.$el.html('');
+            var projects = this.collection.filter(function (post) {
+                return post.get('project') === project;
+            });
+            _.each(projects, function (post) {
+                this.$el.append(post.get('content').text + '<br />');
+            }, this);
+        }
+    });
+
+    var MenuView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'menu',
         events: {
             'click .name': 'showProject'
-        },
-        showProject: function (evt) {
-            var project = evt.currentTarget.hash;
-            router.navigate(project, {trigger:true});
         },
         initialize: function () {
             var self = this;
@@ -90,15 +100,19 @@
             var self = this;
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
 
+            self.$el.html('');
             _.each(projectNames, function (name) {
                 self.$el.append('<a href="#' + name + '" class="name">' + name + '</a><br />');
             });
 
             router.navigate('');// just save this place
-        }
+        },
+        showProject: function (evt) {
+            var project = evt.currentTarget.hash;
+            router.navigate(project, {trigger:true});
+        }        
     });
 
-    var pView = new ProjectsView({collection: postsCollection});
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -107,23 +121,24 @@
             ':project/:task': 'task'
         },
         home: function () {
-            $('html').html(pView.$el);
+            $('html').html(menuView.$el);
         },
         project: function (project) {
-            var projects = pView.collection.filter(function (post) {
-                return post.get('project') === project;
-            });
-            _.each(projects, function (post) {
-                pView.$el.append(post.get('content').text + '<br />');
-            });
-            $('html').html(pView.$el);
+            $('html').html(menuView.$el);
+            pView.render(project);
+            $('html').append(pView.$el);
         },
         task: function (project, task) {
             // debugger;
         }
     });
+
+    var menuView = new MenuView({collection: postsCollection});
+    var pView = new ProjectsView({collection: postsCollection});    
+
     var router = new Router();
     Backbone.history.start();
+
 
     // var postsWithTasks = _.filter(posts, function (post) {
     //     return post.type == 'https://tent.io/types/post/status/v0.1.0' && PostModel.prototype.taskPattern.test(post.content.text);
