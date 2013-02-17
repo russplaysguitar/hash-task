@@ -70,6 +70,56 @@
 
     grunt.registerTask('run', 'server watch');
 
+    // todo: clean this up with promises?
+    grunt.registerTask( "gh-pages", "Generate gh-pages", function() {
+      var done = this.async();
+      grunt.util.spawn({
+        cmd: "cp",
+        args: ["-R", "dist", "../tmp"]
+      }, function(err, result) {
+        if (err) {
+          grunt.log.error(err);
+          return done(false);
+        }
+        grunt.util.spawn({
+          cmd: "git",
+          args: ["checkout", "gh-pages"]
+        }, function(err, result) {
+          if (err) {
+            grunt.log.error(err);
+            return done(false);
+          }
+          grunt.util.spawn({
+            cmd: "mv",
+            args: ["../tmp/*", "."]
+          }, function(err, result) {
+            if (err) {
+              grunt.log.error(err);
+              return done(false);
+            }
+            grunt.util.spawn({
+              cmd: "git",
+              args: ["commit", "-am", "Update gh-pages"]
+            }, function(err, result) {
+              if (err) {
+                grunt.log.error(err);
+                return done(false);
+              }
+              grunt.util.spawn({
+                cmd: "git",
+                args: ["checkout", "master"]
+              }, function(err, result) {
+                if (err) {
+                  grunt.log.error(err);
+                  return done(false);
+                }
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
     /*
       TODO: setup a grunt task using grunt.util.spawn() to build gh-pages.
       (example: https://github.com/scottgonzalez/grunt-git-authors/blob/master/tasks/git-authors.js)
