@@ -92,7 +92,7 @@
             }
             grunt.util.spawn({
               cmd: "git",
-              args: ["commit", "-am", "Update gh-pages"]
+              args: ["add", "."]
             }, function(err, result) {
               if (err) {
                 grunt.log.error(err);
@@ -100,13 +100,22 @@
               }
               grunt.util.spawn({
                 cmd: "git",
-                args: ["checkout", "master"]
+                args: ["commit", "-am", "Update gh-pages"]
               }, function(err, result) {
                 if (err) {
                   grunt.log.error(err);
                   return done(false);
                 }
-                done();
+                grunt.util.spawn({
+                  cmd: "git",
+                  args: ["checkout", "master"]
+                }, function(err, result) {
+                  if (err) {
+                    grunt.log.error(err);
+                    return done(false);
+                  }
+                  done();
+                });
               });
             });
           });
