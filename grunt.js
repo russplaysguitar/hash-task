@@ -111,7 +111,7 @@
         cmd: "git",
         args: ["commit", "-am", "Update gh-pages"]
       });
-      var git_checkout_master = _.partial({
+      var git_checkout_master = _.partial(dfd_spawn, {
         cmd: "git",
         args: ["checkout", "master"]
       });
