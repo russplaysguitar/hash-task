@@ -70,6 +70,19 @@
 
     grunt.registerTask('run', 'server watch');
 
+    /*
+      TODO: setup a grunt task using grunt.util.spawn() to build gh-pages.
+      (example: https://github.com/scottgonzalez/grunt-git-authors/blob/master/tasks/git-authors.js)
+      (see: https://github.com/gruntjs/grunt/wiki/grunt.util#wiki-grunt-util-spawn)
+      1. compile source
+      2. copy source to tmp directory
+      3. git checkout gh-pages
+      4. move source into root
+      5. delete tmp files
+      6. git commit
+      7. git checkout master
+    */
+
     // Default task.
     grunt.registerTask('default', 'lint jasmine concat min');
 
