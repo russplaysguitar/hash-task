@@ -128,10 +128,10 @@
       });
 
       $.when(git_checkout_gh_pages())
-        .then(cp_dist())
-        .then(git_add())
-        .then(git_commit())
-        .then(git_checkout_master())
+        .then(cp_dist)
+        .then(git_add)
+        .then(git_commit)
+        .then(git_checkout_master)
         .done(function () {
           done();
         });
