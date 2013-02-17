@@ -27,7 +27,7 @@
     "grunt-jasmine-runner" : "0.5.5",
     "underscore" : "1.4.4",
     "backbone" : "0.9.10",
-    "jquery" : "1.9.1",
+    "jquery" : "1.8.3",
     "moment" : "2.0.0"
   },
   "scripts": {
