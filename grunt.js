@@ -84,7 +84,7 @@
           }
           grunt.util.spawn({
             cmd: "cp",
-            args: ["-R", "dist/*", "./"]
+            args: ["-R", "dist/", "./"]
           }, function(err, result) {
             if (err) {
               grunt.log.error(err);
