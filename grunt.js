@@ -83,6 +83,8 @@
       var _ = require('underscore'),
           $ = require('jquery');
 
+      var done = this.async();
+
       var dfd_spawn = function (opts) {
         var dfd = new $.Deferred();
         grunt.util.spawn(opts, function (err, result) {
@@ -115,8 +117,6 @@
         cmd: "git",
         args: ["checkout", "master"]
       });
-
-      var done = this.async();
 
       $.when(git_checkout_gh_pages())
         .then(cp_dist())
