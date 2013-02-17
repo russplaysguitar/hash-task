@@ -1,11 +1,11 @@
-/*global module:false*/
+/*global require,module:false*/
 (function () {
     'use strict';
 
   module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
-      pkg: '<json:package.json>',
+      pkg: grunt.file.readJSON('package.json'),
       meta: {
         banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
           '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -71,68 +71,63 @@
     grunt.registerTask('run', 'server watch');
 
 
-    // todo: clean this up with promises?
+    /*
+      Grunt task using to build gh-pages.
+      1. git checkout gh-pages
+      2. move source into root
+      3. git add
+      4. git commit
+      5. git checkout master
+    */
     grunt.registerTask( "gh-pages", "Generate gh-pages", function() {
-      var done = this.async();
-        grunt.util.spawn({
-          cmd: "git",
-          args: ["checkout", "gh-pages"]
-        }, function(err, result) {
+      var _ = require('underscore'),
+          $ = require('jquery');
+
+      var dfd_spawn = function (opts) {
+        var dfd = new $.Deferred();
+        grunt.util.spawn(opts, function (err, result) {
           if (err) {
-            grunt.log.error(err);
+            dfd.reject(err);
             return done(false);
           }
-          grunt.util.spawn({
-            cmd: "cp",
-            args: ["-R", "dist/", "./"]
-          }, function(err, result) {
-            if (err) {
-              grunt.log.error(err);
-              return done(false);
-            }
-            grunt.util.spawn({
-              cmd: "git",
-              args: ["add", "."]
-            }, function(err, result) {
-              if (err) {
-                grunt.log.error(err);
-                return done(false);
-              }
-              grunt.util.spawn({
-                cmd: "git",
-                args: ["commit", "-am", "Update gh-pages"]
-              }, function(err, result) {
-                if (err) {
-                  grunt.log.error(err);
-                  return done(false);
-                }
-                grunt.util.spawn({
-                  cmd: "git",
-                  args: ["checkout", "master"]
-                }, function(err, result) {
-                  if (err) {
-                    grunt.log.error(err);
-                    return done(false);
-                  }
-                  done();
-                });
-              });
-            });
-          });
+          dfd.resolve(result);
         });
+        return dfd.promise();
+      };
+
+      var git_checkout_gh_pages = _.partial(dfd_spawn, {
+        cmd: "git",
+        args: ["checkout", "gh-pages"]
       });
-    /*
-      TODO: setup a grunt task using grunt.util.spawn() to build gh-pages.
-      (example: https://github.com/scottgonzalez/grunt-git-authors/blob/master/tasks/git-authors.js)
-      (see: https://github.com/gruntjs/grunt/wiki/grunt.util#wiki-grunt-util-spawn)
-      1. compile source
-      2. copy source to tmp directory
-      3. git checkout gh-pages
-      4. move source into root
-      5. delete tmp files
-      6. git commit
-      7. git checkout master
-    */
+      var cp_dist = _.partial(dfd_spawn, {
+        cmd: "cp",
+        args: ["-R", "dist/", "./"]
+      });
+      var git_add = _.partial(dfd_spawn, {
+        cmd: "git",
+        args: ["add", "."]
+      });
+      var git_commit = _.partial(dfd_spawn, {
+        cmd: "git",
+        args: ["commit", "-am", "Update gh-pages"]
+      });
+      var git_checkout_master = _.partial({
+        cmd: "git",
+        args: ["checkout", "master"]
+      });
+
+      var done = this.async();
+
+      $.when(git_checkout_gh_pages())
+        .then(cp_dist())
+        .then(git_add())
+        .then(git_commit())
+        .then(git_checkout_master())
+        .done(function () {
+          done();
+        });
+    });
+
 
     // Default task.
     grunt.registerTask('default', 'lint jasmine concat min');
