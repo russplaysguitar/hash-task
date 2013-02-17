@@ -38,6 +38,13 @@
           dest: 'dist/<%= pkg.name %>.min.js'
         }
       },
+      copy: {
+        dist: {
+          files: {
+            "dist/": "src/**" 
+          }
+        }
+      },
       watch: {
         files: '<config:lint.files>',
         tasks: 'lint jasmine'
@@ -67,8 +74,10 @@
 
     grunt.loadNpmTasks('grunt-growl');
     grunt.loadNpmTasks('grunt-jasmine-runner');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('run', 'server watch');
+    grunt.registerTask('build', 'copy');
 
 
     /*
