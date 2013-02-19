@@ -71,7 +71,10 @@
         events: {
             'click .btn': 'showTask'
         },
+        project: null,
         render: function (project) {
+            project = project ? project : this.project;
+            this.project = project;
 
             // get posts for project
             var posts = this.collection.filter(function (post) {
@@ -119,7 +122,11 @@
     var PostsView = Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
+        task: null,
         render: function (task) {
+            task = task ? task : this.task;
+            this.task = task;
+
             // get posts for task
             var posts = this.collection.filter(function (post) {
                 return post.get('task') === task;
@@ -166,22 +173,53 @@
         tagName: 'div',
         className: '',
         events: {
-            'submit': 'newPost'
+            'click .btn': 'newPost'
         },
         render: function () {
             // update DOM
             this.$el.html('');
             var template = _.template(
-                '<form>' +
+                '<form class="form-horizontal"><div class="control-group">' +
                 '<textarea name="comment" placeholder="Task comment" required></textarea><br />' +
-                '<input type="submit" value="New Task" class="btn btn-inverse">' +
-                '</form>'
+                '<button type="submit" class="btn btn-inverse">New Task</button>' +
+                '</div></form>'
             );
             this.$el.append(template());
             return this.$el;
         },
         newPost: function (evt) {
 
+            return false;
+        }
+    });
+
+    var EntityView = Backbone.View.extend({
+        tagName: 'div',
+        className: '',
+        events: {
+            'click .btn': 'setEntity'
+        },
+        initialize: function () {
+            this.model = new Backbone.Model({
+                entity: ''
+            });
+        },
+        render: function () {
+            // update DOM
+            this.$el.html('');
+            var template = _.template(
+                '<form class="form-inline"><div class="control-group">' +
+                '<input type="url" placeholder="https://yourname.tent.is" value="'+this.model.get('entity')+'" required>' +
+                '<button type="submit" class="btn">Submit</button>' +
+                '</div></form>'
+            );
+            this.$el.append(template());
+            return this.$el;
+        },
+        setEntity: function (evt) {
+            var entity = this.$('input').val();
+            this.model.set('entity', entity);
+            localStorage.entity = entity;
             return false;
         }
     });
@@ -193,18 +231,21 @@
             ':project/:task': 'task'
         },
         home: function () {
+            $('.tentEntity').html(entityView.render());
             $('.newTask').html(newTaskView.render());
             $('.projectsList').html(projectsView.render());
             $('.tasksList').html('');
             $('.postsList').html('');
         },
         project: function (project) {
+            $('.tentEntity').html(entityView.render());
             $('.newTask').html(newTaskView.render());
             $('.projectsList').html(projectsView.render());
             $('.tasksList').html(tasksView.render(project));
             $('.postsList').html('');
         },
         task: function (project, task) {
+            $('.tentEntity').html(entityView.render());
             $('.newTask').html(newTaskView.render());
             $('.projectsList').html(projectsView.render());
             $('.tasksList').html(tasksView.render(project));
@@ -214,36 +255,56 @@
     var router = new Router();
 
     var postsCollection = new PostCollection();
-    postsCollection.url = 'https://russ.tent.is/tent/posts';
-    postsCollection.fetch();
-
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
     var postsView = new PostsView({collection: postsCollection});
-    var newTaskView = new NewTaskView();
 
-    var followingsCollection = new Backbone.Collection();
-    followingsCollection.url = 'https://russ.tent.is/tent/followings';
-    followingsCollection.fetch({
-        success: function (collection) {
-            var pendingSyncs = 0;
-            // fetch posts for each entity this user is following
-            collection.each(function (following) {
-                var entity = following.get('entity');
-                var followingPosts = new PostCollection();
-                followingPosts.url = entity + '/tent/posts';
-                pendingSyncs++;
-                followingPosts.fetch({
-                    success: function (fpCollection) {
-                        // add the new posts to the main posts collection
-                        postsCollection.add(fpCollection.models);
-                        pendingSyncs--;
-                        if (!pendingSyncs) {
-                            Backbone.history.start();
+    var FollowingsCollection = Backbone.Collection.extend({
+        fetch_opts: {
+            success: function (collection) {
+                // fetch posts for each entity this user is following
+                var pending = collection.length;
+                collection.each(function (following) {
+                    pending--;
+                    var entity = following.get('entity');
+                    var followingPosts = new PostCollection();
+                    followingPosts.url = entity + '/tent/posts';
+                    followingPosts.fetch({
+                        success: function (fpCollection) {
+                            // add the new posts to the main posts collection
+                            postsCollection.add(fpCollection.models);
+                            if (!pending) {
+                                entityView.render();
+                                newTaskView.render();
+                                projectsView.render();
+                                tasksView.render();
+                                postsView.render();
+                            }
                         }
-                    }
+                    });
                 });
-            });
+            }
+        }
+    });
+    var followingsCollection = new FollowingsCollection();
+
+    var newTaskView = new NewTaskView();
+    var entityView = new EntityView();
+    entityView.model.on('change:entity', function (newModel) {
+        var entity = newModel.get('entity');
+        if (entity) {
+            postsCollection.url = newModel.get('entity') + '/tent/posts';
+            postsCollection.fetch();
+
+            followingsCollection.url = newModel.get('entity') + '/tent/followings';
+            followingsCollection.fetch(followingsCollection.fetch_opts);
+        }
+    });
+
+    $(document).ready(function () {
+        Backbone.history.start();
+        if (localStorage.entity) {
+            entityView.model.set('entity', localStorage.entity);
         }
     });
 
