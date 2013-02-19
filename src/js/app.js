@@ -162,6 +162,29 @@
         }
     });
 
+    var NewTaskView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'newTask',
+        events: {
+            'submit': 'newPost'
+        },
+        render: function () {
+            // update DOM
+            this.$el.html('');
+            var template = _.template(
+                '<form>' +
+                '<textarea name="comment" placeholder="Task comment" required></textarea><br />' +
+                '<input type="submit" value="New Task" class="btn btn-inverse">' +
+                '</form>'
+            );
+            this.$el.append(template());
+            return this.$el;
+        },
+        newPost: function (evt) {
+            alert('k');
+            return false;
+        }
+    });
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -170,16 +193,19 @@
             ':project/:task': 'task'
         },
         home: function () {
+            $('#newTask').html(newTaskView.render());
             $('#projectsList').html(projectsView.render());
             $('#tasksList').html('');
             $('#postsList').html('');
         },
         project: function (project) {
+            $('#newTask').html(newTaskView.render());
             $('#projectsList').html(projectsView.render());
             $('#tasksList').html(tasksView.render(project));
             $('#postsList').html('');
         },
         task: function (project, task) {
+            $('#newTask').html(newTaskView.render());
             $('#projectsList').html(projectsView.render());
             $('#tasksList').html(tasksView.render(project));
             $('#postsList').html(postsView.render(task));
@@ -194,6 +220,7 @@
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
     var postsView = new PostsView({collection: postsCollection});
+    var newTaskView = new NewTaskView();
 
     var followingsCollection = new Backbone.Collection();
     followingsCollection.url = 'https://russ.tent.is/tent/followings';
