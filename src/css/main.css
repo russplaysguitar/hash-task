@@ -1,15 +1,15 @@
-#tasksList, #projectsList {
+.tasksList, .projectsList {
     margin-bottom: 10px;
 }
 
-#newTask {
+.newTask {
     width: 520px;
 }
 
-#newTask textarea {
+.newTask textarea {
     width: 500px;
 }
 
-#newTask .btn {
+.newTask .btn {
     float: right;
 }

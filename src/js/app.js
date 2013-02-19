@@ -164,7 +164,7 @@
 
     var NewTaskView = Backbone.View.extend({
         tagName: 'div',
-        className: 'newTask',
+        className: '',
         events: {
             'submit': 'newPost'
         },
@@ -181,7 +181,7 @@
             return this.$el;
         },
         newPost: function (evt) {
-            alert('k');
+
             return false;
         }
     });
@@ -193,22 +193,22 @@
             ':project/:task': 'task'
         },
         home: function () {
-            $('#newTask').html(newTaskView.render());
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html('');
-            $('#postsList').html('');
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html('');
+            $('.postsList').html('');
         },
         project: function (project) {
-            $('#newTask').html(newTaskView.render());
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html(tasksView.render(project));
-            $('#postsList').html('');
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html(tasksView.render(project));
+            $('.postsList').html('');
         },
         task: function (project, task) {
-            $('#newTask').html(newTaskView.render());
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html(tasksView.render(project));
-            $('#postsList').html(postsView.render(task));
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html(tasksView.render(project));
+            $('.postsList').html(postsView.render(task));
         }
     });
     var router = new Router();
