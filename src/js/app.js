@@ -1,4 +1,4 @@
-/*global Backbone,_,$,Mustache,sjcl*/
+/*global Backbone,_,$,Mustache,sjcl,app_auth*/
 (function () {
     'use strict';
 
@@ -176,14 +176,19 @@
             'click .btn': 'newPost'
         },
         render: function () {
-            // update DOM
-            var template = 
-                '<form class="form-horizontal"><div class="control-group">' +
-                '<textarea class="comment" name="comment" placeholder="Task comment" required></textarea><br />' +
-                '<button type="submit" class="btn btn-inverse">New Task</button>' +
-                '</div></form>'
-            ;
-            this.$el.html(template);
+            if (localStorage.entity) {
+                // update DOM
+                var template = 
+                    '<form action="javascript:;" class="form-horizontal"><div class="control-group">' +
+                    '<textarea class="comment" name="comment" placeholder="Task comment" required></textarea><br />' +
+                    '<button type="submit" class="btn btn-inverse">New Task</button>' +
+                    '</div></form>'
+                ;
+                this.$el.html(template);
+            }
+            else {
+                this.$el.html('');
+            }
             return this.$el;
         },
         newPost: function (evt) {
@@ -222,6 +227,7 @@
                 }
             };
 
+            var self = this;
             $.ajax({
                 url: 'https://' + request.host + request.path,
                 type: request.method,
@@ -232,11 +238,10 @@
                 },
                 data: JSON.stringify(data),
                 success: function () {
-                    this.$('.comment').val('');
+                    self.$('.comment').val('');
                     Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
                 }
             });
-            return false;
         }
     });
 
@@ -266,9 +271,17 @@
             var entity = this.$('input').val();
             this.model.set('entity', entity);
             localStorage.entity = entity;
+            app_auth.auth(entity + '/tent');
             return false;
         }
     });
+
+    // todo put this in lib shared with app_auth
+    // returns the value of a url parameter
+    var getURLParameter = function (name) {
+        // from: http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[null,""])[1].replace(/\+/g, '%20'))||null;
+    };
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -344,10 +357,19 @@
 
             followingsCollection.url = newModel.get('entity') + '/tent/followings';
             followingsCollection.fetch(followingsCollection.fetch_opts);
+
+            newTaskView.render();
         }
     });
 
     $(document).ready(function () {
+
+        var state = getURLParameter('state');
+        if (state) {
+            app_auth.finish(function () {
+                document.location.href = document.location.origin + document.location.pathname;
+            });
+        }
         Backbone.history.start();
         if (localStorage.entity) {
             entityView.model.set('entity', localStorage.entity);

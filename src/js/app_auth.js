@@ -33,7 +33,7 @@ var app_auth = (function () {
             }, this);
         },
         // does the final auth step
-        finish: function () {
+        finish: function (cb) {
             // assumes 'code' and 'state' are in the URL params
 
             // ensure valid response
@@ -75,6 +75,7 @@ var app_auth = (function () {
                 success: function (data, textStatus, jqXHR) {
                     // save authorization data
                     localStorage.AppJSON = JSON.stringify(data);
+                    cb();
                 }
             });
         },
