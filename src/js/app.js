@@ -9,24 +9,10 @@ define([
     'app_auth',
     'models/Post',
     'collections/Post',
-    'views/Tasks'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView) {
+    'views/Tasks',
+    'views/Post'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView) {
     'use strict';
-
-    // a single post
-    var PostView = Backbone.View.extend({
-        tagName: 'blockquote',
-        className: 'post',
-        render: function () {
-            var template = '<p>{{ text }}</p><small>{{ user }}</small>';
-            this.$el.html(Mustache.render(template, {
-                text: this.model.get('content').text,
-                user: this.model.get('user')
-            }));
-
-            return this.$el;
-        }
-    });
 
     // a list of posts for a given task
     var PostsView = Backbone.View.extend({
