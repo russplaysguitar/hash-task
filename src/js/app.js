@@ -67,7 +67,6 @@ define([
         postsCollection.add(fpCollection.models);
     });
     followingsCollection.on('finishedFetchingFollowings', function () {
-        // add the new posts to the main posts collection
         Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
 
