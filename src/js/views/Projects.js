@@ -2,8 +2,8 @@
 
 // a list of projects
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache', 'views/Post'
-], function (Backbone, _, $, Mustache, PostView) {
+    'backbone', 'underscore', 'jquery', 'libs/mustache'
+], function (Backbone, _, $, Mustache) {
     return Backbone.View.extend({
         tagName: 'div',
         className: 'menu',
