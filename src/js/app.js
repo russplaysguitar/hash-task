@@ -13,40 +13,10 @@ define([
     'views/Post',
     'views/Posts',
     'views/Projects',
-    'views/NewTask'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView) {
+    'views/NewTask',
+    'views/Entity'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView) {
     'use strict';
-
-    var EntityView = Backbone.View.extend({
-        tagName: 'div',
-        className: '',
-        events: {
-            'click .btn': 'setEntity'
-        },
-        initialize: function () {
-            this.model = new Backbone.Model({
-                entity: ''
-            });
-        },
-        render: function () {
-            // update DOM
-            var template = 
-                '<form class="form-inline"><div class="control-group">' +
-                '<input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>' +
-                '<button type="submit" class="btn">Submit</button>' +
-                '</div></form>'
-            ;
-            this.$el.html(Mustache.render(template, { entity: this.model.get('entity')} ));
-            return this.$el;
-        },
-        setEntity: function (evt) {
-            var entity = this.$('input').val();
-            this.model.set('entity', entity);
-            localStorage.entity = entity;
-            app_auth.auth(entity + '/tent');
-            return false;
-        }
-    });
 
     // todo put this in lib shared with app_auth
     // returns the value of a url parameter
