@@ -4,6 +4,8 @@
 define([
     'backbone', 'underscore', 'jquery', 'libs/mustache', 'views/Post'
 ], function (Backbone, _, $, Mustache, PostView) {
+    'use strict';
+    
     return Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',

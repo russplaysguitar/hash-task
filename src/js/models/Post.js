@@ -2,6 +2,8 @@
 
 // represents a single post
 define(['backbone'], function (Backbone){
+    'use strict';
+    
     return Backbone.Model.extend({
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
         statusPattern: /\#(open|assign|close)/i,

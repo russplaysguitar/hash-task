@@ -2,6 +2,8 @@
 
 // a single post
 define(['backbone', 'jquery', 'libs/mustache'], function (Backbone, $, Mustache) {
+    'use strict';
+    
     return Backbone.View.extend({
         tagName: 'blockquote',
         className: 'post',

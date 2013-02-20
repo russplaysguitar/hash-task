@@ -2,6 +2,8 @@
 
 // a list of tasks for a given project
 define(['backbone', 'underscore', 'jquery', 'libs/Mustache'], function (Backbone, _, $, Mustache) {
+    'use strict';
+    
     return Backbone.View.extend({
         tagName: 'div',
         className: 'project',

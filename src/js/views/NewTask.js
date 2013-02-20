@@ -3,6 +3,8 @@
 define([
     'backbone', 'underscore', 'jquery', 'libs/mustache', 'sjcl'
 ], function (Backbone, _, $, Mustache, sjcl) {
+    'use strict';
+    
     return Backbone.View.extend({
         tagName: 'div',
         className: '',

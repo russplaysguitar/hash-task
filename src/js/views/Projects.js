@@ -4,6 +4,8 @@
 define([
     'backbone', 'underscore', 'jquery', 'libs/mustache'
 ], function (Backbone, _, $, Mustache) {
+    'use strict';
+    
     return Backbone.View.extend({
         tagName: 'div',
         className: 'menu',

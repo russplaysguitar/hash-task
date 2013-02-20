@@ -1,8 +1,10 @@
-/*global define*/
+/*global define,localStorage*/
 
 define([
     'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth'
 ], function (Backbone, _, $, Mustache, app_auth) {
+    'use strict';
+
     return Backbone.View.extend({
         tagName: 'div',
         className: '',

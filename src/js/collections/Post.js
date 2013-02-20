@@ -2,6 +2,8 @@
 
 // represents a collection of posts
 define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostModel) {
+    'use strict';
+    
     return Backbone.Collection.extend({
         model: PostModel,
         parse: function (json) {
