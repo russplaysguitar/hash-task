@@ -15,8 +15,9 @@ define([
     'views/Projects',
     'views/NewTask',
     'views/Entity',
-    'utils/url'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils) {
+    'utils/url',
+    'collections/Followings'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -60,34 +61,19 @@ define([
     });
     var postsView = new PostsView({collection: postsCollection});
 
-    var FollowingsCollection = Backbone.Collection.extend({
-        fetch_opts: {
-            success: function (collection) {
-                // fetch posts for each entity this user is following
-                var pending = collection.length;
-                collection.each(function (following) {
-                    pending--;
-                    var entity = following.get('entity');
-                    var followingPosts = new PostCollection();
-                    followingPosts.url = entity + '/tent/posts';
-                    followingPosts.fetch({
-                        success: function (fpCollection) {
-                            // add the new posts to the main posts collection
-                            postsCollection.add(fpCollection.models);
-                            if (!pending) {
-                                entityView.render();
-                                newTaskView.render();
-                                projectsView.render();
-                                tasksView.render();
-                                postsView.render();
-                            }
-                        }
-                    });
-                });
-            }
-        }
-    });
     var followingsCollection = new FollowingsCollection();
+    followingsCollection.on('gotMoreFollowings', function (fpCollection) {
+        // add the new posts to the main posts collection
+        postsCollection.add(fpCollection.models);
+    });
+    followingsCollection.on('finishedFetchingFollowings', function () {
+        // add the new posts to the main posts collection
+        entityView.render();
+        newTaskView.render();
+        projectsView.render();
+        tasksView.render();
+        postsView.render();
+    });
 
     var newTaskView = new NewTaskView();
     var entityView = new EntityView();
