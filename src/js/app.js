@@ -10,34 +10,10 @@ define([
     'models/Post',
     'collections/Post',
     'views/Tasks',
-    'views/Post'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView) {
+    'views/Post',
+    'views/Posts'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView) {
     'use strict';
-
-    // a list of posts for a given task
-    var PostsView = Backbone.View.extend({
-        tagName: 'div',
-        className: 'tasks',
-        task: null,
-        render: function (task) {
-            task = task ? task : this.task;
-            this.task = task;
-
-            // get posts for task
-            var posts = this.collection.filter(function (post) {
-                return post.get('task') === task;
-            });
-
-            // update DOM
-            this.$el.html('');
-            _.each(posts, function (post) {
-                var postView = new PostView({model: post});
-                this.$el.append(postView.render());
-            }, this);
-
-            return this.$el;
-        }
-    });
 
     // a list of projects
     var ProjectsView = Backbone.View.extend({
