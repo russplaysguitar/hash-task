@@ -5,7 +5,7 @@ define([
     'underscore',
     'jquery',
     'libs/mustache',
-    'libs/sjcl',
+    'sjcl',
     'app_auth'
 ], function (Backbone,_,$,Mustache,sjcl,app_auth) {
     'use strict';

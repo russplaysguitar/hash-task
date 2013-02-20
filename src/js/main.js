@@ -5,7 +5,8 @@ require.config({
     paths: {
         underscore: 'libs/underscore',
         backbone: 'libs/backbone',
-        jquery: 'libs/jquery'
+        jquery: 'libs/jquery',
+        sjcl: 'libs/sjcl'
     },
     shim: {
         underscore: {
@@ -17,6 +18,9 @@ require.config({
         backbone: {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
+        },
+        sjcl: {
+            exports: 'sjcl'
         }
     }
 });

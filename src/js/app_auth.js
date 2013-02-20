@@ -1,7 +1,13 @@
-/*global Backbone,_,$,sjcl*/
+/*global define*/
 
 // usage: call app_auth.auth(entity + '/tent') then call app_auth.finish()
-var app_auth = (function () {
+
+define([
+    'backbone',
+    'underscore',
+    'jquery',
+    'sjcl'
+], function (Backbone,_,$,sjcl) {
     'use strict';
 
     // returns the value of a url parameter
@@ -189,4 +195,4 @@ var app_auth = (function () {
             document.location.href = server + '/oauth/authorize?' + $.param(queryString);
         }
     };
-}());
+});
