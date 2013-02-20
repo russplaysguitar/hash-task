@@ -1,4 +1,4 @@
-/*global Backbone,_,$*/
+/*global Backbone,_,$,Mustache,sjcl,app_auth*/
 (function () {
     'use strict';
 
@@ -71,7 +71,10 @@
         events: {
             'click .btn': 'showTask'
         },
+        project: null,
         render: function (project) {
+            project = project ? project : this.project;
+            this.project = project;
 
             // get posts for project
             var posts = this.collection.filter(function (post) {
@@ -84,11 +87,12 @@
 
             // update DOM
             this.$el.html('');
-            var template = _.template('<a href="<%= location %>" class="btn btn-success"><%= task %></a> ');
+            var template = '<a href="{{ location }}" class="btn btn-success">{{ task }}</a> ';
             var locParts = document.location.hash.split('/');
             _.each(tasks, function (task) {
                 locParts[1] = task;
-                this.$el.append(template({location: locParts.join('/'), task: task}));
+                var data = {location: locParts.join('/'), task: task};
+                this.$el.append(Mustache.render(template, data));
             }, this);
 
             return this.$el;
@@ -104,9 +108,8 @@
         tagName: 'blockquote',
         className: 'post',
         render: function () {
-            this.$el.html('');
-            var template = _.template('<p><%= text %></p><small><%= user %></small>');
-            this.$el.html(template({
+            var template = '<p>{{ text }}</p><small>{{ user }}</small>';
+            this.$el.html(Mustache.render(template, {
                 text: this.model.get('content').text,
                 user: this.model.get('user')
             }));
@@ -119,7 +122,11 @@
     var PostsView = Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
+        task: null,
         render: function (task) {
+            task = task ? task : this.task;
+            this.task = task;
+
             // get posts for task
             var posts = this.collection.filter(function (post) {
                 return post.get('task') === task;
@@ -149,9 +156,9 @@
 
             // update DOM
             this.$el.html('');
-            var template = _.template('<a href="#<%= name %>" class="btn btn-primary"><%= name %></a> ');
+            var template = '<a href="#{{ name }}" class="btn btn-primary">{{ name }}</a> ';
             _.each(projectNames, function (name) {
-                this.$el.append(template({name: name}));
+                this.$el.append(Mustache.render(template, {name: name}));
             }, this);
 
             return this.$el;
@@ -162,6 +169,119 @@
         }
     });
 
+    var NewTaskView = Backbone.View.extend({
+        tagName: 'div',
+        className: '',
+        events: {
+            'click .btn': 'newPost'
+        },
+        render: function () {
+            if (localStorage.entity) {
+                // update DOM
+                var template = 
+                    '<form action="javascript:;" class="form-horizontal"><div class="control-group">' +
+                    '<textarea class="comment" name="comment" placeholder="Task comment" required></textarea><br />' +
+                    '<button type="submit" class="btn btn-inverse">New Task</button>' +
+                    '</div></form>'
+                ;
+                this.$el.html(template);
+            }
+            else {
+                this.$el.html('');
+            }
+            return this.$el;
+        },
+        newPost: function (evt) {
+            var AppJSON = JSON.parse(localStorage.AppJSON);
+            var matches = /^(http|https):\/\/([.\d\w\-]+)/.exec(localStorage.entity);
+            var host = matches[2];
+
+            // prepare request string for hmac signature
+            var request = {
+                method: 'POST',
+                path: '/tent/posts',
+                host: host,
+                port: 443
+            };
+            var date = new Date(),
+                timestamp = parseInt((date * 1) / 1000, 10),
+                nonce = Math.random().toString(16).substring(3),
+                request_string = [timestamp, nonce, request.method.toUpperCase(), request.path, request.host, request.port, null, null].join("\n");
+
+            // create base64-encoded hash token for authentication
+            // TODO: support other encryptions. (currently assuming sha-256-hmac)
+            var hmac = new sjcl.misc.hmac(sjcl.codec.utf8String.toBits(AppJSON.mac_key));
+            var signature = sjcl.codec.base64.fromBits(hmac.mac(request_string));
+
+            var data = {
+                "type": "https://tent.io/types/post/status/v0.1.0",
+                "published_at": timestamp,
+                "permissions": {
+                    "public": true
+                },
+                "licenses": [
+                    "http://creativecommons.org/licenses/by/3.0/"
+                ],
+                "content": {
+                    "text": this.$('.comment').val()
+                }
+            };
+
+            var self = this;
+            $.ajax({
+                url: 'https://' + request.host + request.path,
+                type: request.method,
+                contentType: 'application/vnd.tent.v0+json',
+                headers: {
+                    'Accept': 'application/vnd.tent.v0+json',
+                    'Authorization': 'MAC id="'+AppJSON.access_token+'", ts="'+timestamp+'", nonce="'+nonce+'", mac="'+signature+'"'
+                },
+                data: JSON.stringify(data),
+                success: function () {
+                    self.$('.comment').val('');
+                    Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
+                }
+            });
+        }
+    });
+
+    var EntityView = Backbone.View.extend({
+        tagName: 'div',
+        className: '',
+        events: {
+            'click .btn': 'setEntity'
+        },
+        initialize: function () {
+            this.model = new Backbone.Model({
+                entity: ''
+            });
+        },
+        render: function () {
+            // update DOM
+            var template = 
+                '<form class="form-inline"><div class="control-group">' +
+                '<input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>' +
+                '<button type="submit" class="btn">Submit</button>' +
+                '</div></form>'
+            ;
+            this.$el.html(Mustache.render(template, { entity: this.model.get('entity')} ));
+            return this.$el;
+        },
+        setEntity: function (evt) {
+            var entity = this.$('input').val();
+            this.model.set('entity', entity);
+            localStorage.entity = entity;
+            app_auth.auth(entity + '/tent');
+            return false;
+        }
+    });
+
+    // todo put this in lib shared with app_auth
+    // returns the value of a url parameter
+    var getURLParameter = function (name) {
+        // from: http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[null,""])[1].replace(/\+/g, '%20'))||null;
+    };
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -170,53 +290,89 @@
             ':project/:task': 'task'
         },
         home: function () {
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html('');
-            $('#postsList').html('');
+            $('.tentEntity').html(entityView.render());
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html('');
+            $('.postsList').html('');
         },
         project: function (project) {
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html(tasksView.render(project));
-            $('#postsList').html('');
+            $('.tentEntity').html(entityView.render());
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html(tasksView.render(project));
+            $('.postsList').html('');
         },
         task: function (project, task) {
-            $('#projectsList').html(projectsView.render());
-            $('#tasksList').html(tasksView.render(project));
-            $('#postsList').html(postsView.render(task));
+            $('.tentEntity').html(entityView.render());
+            $('.newTask').html(newTaskView.render());
+            $('.projectsList').html(projectsView.render());
+            $('.tasksList').html(tasksView.render(project));
+            $('.postsList').html(postsView.render(task));
         }
     });
     var router = new Router();
 
     var postsCollection = new PostCollection();
-    postsCollection.url = 'https://russ.tent.is/tent/posts';
-    postsCollection.fetch();
-
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
     var postsView = new PostsView({collection: postsCollection});
 
-    var followingsCollection = new Backbone.Collection();
-    followingsCollection.url = 'https://russ.tent.is/tent/followings';
-    followingsCollection.fetch({
-        success: function (collection) {
-            var pendingSyncs = 0;
-            // fetch posts for each entity this user is following
-            collection.each(function (following) {
-                var entity = following.get('entity');
-                var followingPosts = new PostCollection();
-                followingPosts.url = entity + '/tent/posts';
-                pendingSyncs++;
-                followingPosts.fetch({
-                    success: function (fpCollection) {
-                        // add the new posts to the main posts collection
-                        postsCollection.add(fpCollection.models);
-                        pendingSyncs--;
-                        if (!pendingSyncs) {
-                            Backbone.history.start();
+    var FollowingsCollection = Backbone.Collection.extend({
+        fetch_opts: {
+            success: function (collection) {
+                // fetch posts for each entity this user is following
+                var pending = collection.length;
+                collection.each(function (following) {
+                    pending--;
+                    var entity = following.get('entity');
+                    var followingPosts = new PostCollection();
+                    followingPosts.url = entity + '/tent/posts';
+                    followingPosts.fetch({
+                        success: function (fpCollection) {
+                            // add the new posts to the main posts collection
+                            postsCollection.add(fpCollection.models);
+                            if (!pending) {
+                                entityView.render();
+                                newTaskView.render();
+                                projectsView.render();
+                                tasksView.render();
+                                postsView.render();
+                            }
                         }
-                    }
+                    });
                 });
+            }
+        }
+    });
+    var followingsCollection = new FollowingsCollection();
+
+    var newTaskView = new NewTaskView();
+    var entityView = new EntityView();
+    entityView.model.on('change:entity', function (newModel) {
+        var entity = newModel.get('entity');
+        if (entity) {
+            postsCollection.url = newModel.get('entity') + '/tent/posts';
+            postsCollection.fetch();
+
+            followingsCollection.url = newModel.get('entity') + '/tent/followings';
+            followingsCollection.fetch(followingsCollection.fetch_opts);
+
+            newTaskView.render();
+        }
+    });
+
+    $(document).ready(function () {
+
+        var state = getURLParameter('state');
+        if (state) {
+            app_auth.finish(function () {
+                document.location.href = document.location.origin + document.location.pathname;
             });
+        }
+        Backbone.history.start();
+        if (localStorage.entity) {
+            entityView.model.set('entity', localStorage.entity);
         }
     });
 
