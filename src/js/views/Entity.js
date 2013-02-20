@@ -1,8 +1,8 @@
 /*global define,localStorage*/
 
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth'
-], function (Backbone, _, $, Mustache, app_auth) {
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth', 'text!templates/entity.html'
+], function (Backbone, _, $, Mustache, app_auth, entityTemplate) {
     'use strict';
 
     return Backbone.View.extend({
@@ -18,13 +18,7 @@ define([
         },
         render: function () {
             // update DOM
-            var template = 
-                '<form class="form-inline"><div class="control-group">' +
-                '<input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>' +
-                '<button type="submit" class="btn">Submit</button>' +
-                '</div></form>'
-            ;
-            this.$el.html(Mustache.render(template, { entity: this.model.get('entity')} ));
+            this.$el.html(Mustache.render(entityTemplate, { entity: this.model.get('entity')} ));
             return this.$el;
         },
         setEntity: function (evt) {

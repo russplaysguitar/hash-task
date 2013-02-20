@@ -1,8 +1,8 @@
 /*global define*/
 
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache', 'sjcl'
-], function (Backbone, _, $, Mustache, sjcl) {
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'sjcl', 'text!templates/new_task.html'
+], function (Backbone, _, $, Mustache, sjcl, NewTaskTemplate) {
     'use strict';
     
     return Backbone.View.extend({
@@ -14,13 +14,7 @@ define([
         render: function () {
             if (localStorage.entity) {
                 // update DOM
-                var template = 
-                    '<form action="javascript:;" class="form-horizontal"><div class="control-group">' +
-                    '<textarea class="comment" name="comment" placeholder="Task comment" required></textarea><br />' +
-                    '<button type="submit" class="btn btn-inverse">New Task</button>' +
-                    '</div></form>'
-                ;
-                this.$el.html(template);
+                this.$el.html(NewTaskTemplate);
             }
             else {
                 this.$el.html('');

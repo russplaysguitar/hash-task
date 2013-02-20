@@ -6,7 +6,8 @@ require.config({
         underscore: 'libs/underscore',
         backbone: 'libs/backbone',
         jquery: 'libs/jquery',
-        sjcl: 'libs/sjcl'
+        sjcl: 'libs/sjcl',
+        text: 'libs/text'
     },
     shim: {
         underscore: {
