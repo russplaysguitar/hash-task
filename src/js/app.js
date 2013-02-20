@@ -8,48 +8,10 @@ define([
     'sjcl',
     'app_auth',
     'models/Post',
-    'collections/Post'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection) {
+    'collections/Post',
+    'views/Tasks'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView) {
     'use strict';
-
-    // a list of tasks for a given project
-    var TasksView = Backbone.View.extend({
-        tagName: 'div',
-        className: 'project',
-        events: {
-            'click .btn': 'showTask'
-        },
-        project: null,
-        render: function (project) {
-            project = project ? project : this.project;
-            this.project = project;
-
-            // get posts for project
-            var posts = this.collection.filter(function (post) {
-                return post.get('project') === project;
-            });
-
-            // get tasks for project
-            var tasks = _.without(_.keys(_.groupBy(posts, function (post) {
-                return post.get('task'); })), 'null');
-
-            // update DOM
-            this.$el.html('');
-            var template = '<a href="{{ location }}" class="btn btn-success">{{ task }}</a> ';
-            var locParts = document.location.hash.split('/');
-            _.each(tasks, function (task) {
-                locParts[1] = task;
-                var data = {location: locParts.join('/'), task: task};
-                this.$el.append(Mustache.render(template, data));
-            }, this);
-
-            return this.$el;
-        },
-        showTask: function (evt) {
-            var location = evt.currentTarget.hash;
-            router.navigate(location, {trigger:true});
-        }
-    });
 
     // a single post
     var PostView = Backbone.View.extend({
@@ -264,6 +226,9 @@ define([
     var postsCollection = new PostCollection();
     var projectsView = new ProjectsView({collection: postsCollection});
     var tasksView = new TasksView({collection: postsCollection});
+    tasksView.on('taskClicked', function (location) {
+        router.navigate(location, {trigger:true});
+    });
     var postsView = new PostsView({collection: postsCollection});
 
     var FollowingsCollection = Backbone.Collection.extend({
