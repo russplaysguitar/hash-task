@@ -1,7 +1,14 @@
-/*global Backbone,_,$,Mustache,sjcl,app_auth*/
-(function () {
-    'use strict';
+/*global define*/
 
+define([
+    'backbone',
+    'underscore',
+    'jquery',
+    'libs/mustache',
+    'libs/sjcl',
+    'app_auth'
+], function (Backbone,_,$,Mustache,sjcl,app_auth) {
+    'use strict';
     // represents a single post
     var PostModel = Backbone.Model.extend({
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
@@ -362,8 +369,8 @@
         }
     });
 
-    $(document).ready(function () {
-
+    // this is what is run by main.js
+    return function () {
         var state = getURLParameter('state');
         if (state) {
             app_auth.finish(function () {
@@ -374,16 +381,5 @@
         if (localStorage.entity) {
             entityView.model.set('entity', localStorage.entity);
         }
-    });
-
-    // var postsWithTasks = _.filter(posts, function (post) {
-    //     return post.type == 'https://tent.io/types/post/status/v0.1.0' && PostModel.prototype.taskPattern.test(post.content.text);
-    // });
-
-    // var seniorProjectCollection = new PostCollection(postsCollection.filter(function(v){
-    //     return v.get('project') == 'senior_project';
-    // }));
-
-    // var project = new ProjectModel(seniorProjectCollection);
-
-}());
+    };
+});
