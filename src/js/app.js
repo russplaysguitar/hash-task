@@ -11,35 +11,10 @@ define([
     'collections/Post',
     'views/Tasks',
     'views/Post',
-    'views/Posts'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView) {
+    'views/Posts',
+    'views/Projects'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView) {
     'use strict';
-
-    // a list of projects
-    var ProjectsView = Backbone.View.extend({
-        tagName: 'div',
-        className: 'menu',
-        events: {
-            'click .btn': 'showProject'
-        },
-        render: function () {
-            // get list of project names
-            var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
-
-            // update DOM
-            this.$el.html('');
-            var template = '<a href="#{{ name }}" class="btn btn-primary">{{ name }}</a> ';
-            _.each(projectNames, function (name) {
-                this.$el.append(Mustache.render(template, {name: name}));
-            }, this);
-
-            return this.$el;
-        },
-        showProject: function (evt) {
-            var project = evt.currentTarget.hash;
-            router.navigate(project, {trigger:true});
-        }
-    });
 
     var NewTaskView = Backbone.View.extend({
         tagName: 'div',
@@ -187,6 +162,9 @@ define([
 
     var postsCollection = new PostCollection();
     var projectsView = new ProjectsView({collection: postsCollection});
+    projectsView.on('projectClicked', function (project) {
+        router.navigate(project, {trigger:true});
+    });
     var tasksView = new TasksView({collection: postsCollection});
     tasksView.on('taskClicked', function (location) {
         router.navigate(location, {trigger:true});
