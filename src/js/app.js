@@ -1,4 +1,4 @@
-/*global Backbone,_,$*/
+/*global Backbone,_,$,Mustache*/
 (function () {
     'use strict';
 
@@ -87,11 +87,12 @@
 
             // update DOM
             this.$el.html('');
-            var template = _.template('<a href="<%= location %>" class="btn btn-success"><%= task %></a> ');
+            var template = '<a href="{{ location }}" class="btn btn-success">{{ task }}</a> ';
             var locParts = document.location.hash.split('/');
             _.each(tasks, function (task) {
                 locParts[1] = task;
-                this.$el.append(template({location: locParts.join('/'), task: task}));
+                var data = {location: locParts.join('/'), task: task};
+                this.$el.append(Mustache.render(template, data));
             }, this);
 
             return this.$el;
@@ -107,9 +108,8 @@
         tagName: 'blockquote',
         className: 'post',
         render: function () {
-            this.$el.html('');
-            var template = _.template('<p><%= text %></p><small><%= user %></small>');
-            this.$el.html(template({
+            var template = '<p>{{ text }}</p><small>{{ user }}</small>';
+            this.$el.html(Mustache.render(template, {
                 text: this.model.get('content').text,
                 user: this.model.get('user')
             }));
@@ -156,9 +156,9 @@
 
             // update DOM
             this.$el.html('');
-            var template = _.template('<a href="#<%= name %>" class="btn btn-primary"><%= name %></a> ');
+            var template = '<a href="#{{ name }}" class="btn btn-primary">{{ name }}</a> ';
             _.each(projectNames, function (name) {
-                this.$el.append(template({name: name}));
+                this.$el.append(Mustache.render(template, {name: name}));
             }, this);
 
             return this.$el;
@@ -177,14 +177,13 @@
         },
         render: function () {
             // update DOM
-            this.$el.html('');
-            var template = _.template(
+            var template = 
                 '<form class="form-horizontal"><div class="control-group">' +
                 '<textarea name="comment" placeholder="Task comment" required></textarea><br />' +
                 '<button type="submit" class="btn btn-inverse">New Task</button>' +
                 '</div></form>'
-            );
-            this.$el.append(template());
+            ;
+            this.$el.html(template);
             return this.$el;
         },
         newPost: function (evt) {
@@ -206,14 +205,13 @@
         },
         render: function () {
             // update DOM
-            this.$el.html('');
-            var template = _.template(
+            var template = 
                 '<form class="form-inline"><div class="control-group">' +
-                '<input type="url" placeholder="https://yourname.tent.is" value="'+this.model.get('entity')+'" required>' +
+                '<input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>' +
                 '<button type="submit" class="btn">Submit</button>' +
                 '</div></form>'
-            );
-            this.$el.append(template());
+            ;
+            this.$el.html(Mustache.render(template, { entity: this.model.get('entity')} ));
             return this.$el;
         },
         setEntity: function (evt) {
