@@ -68,11 +68,7 @@ define([
     });
     followingsCollection.on('finishedFetchingFollowings', function () {
         // add the new posts to the main posts collection
-        entityView.render();
-        newTaskView.render();
-        projectsView.render();
-        tasksView.render();
-        postsView.render();
+        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
 
     var newTaskView = new NewTaskView();
