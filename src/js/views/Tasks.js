@@ -35,7 +35,8 @@ define(['backbone', 'underscore', 'jquery', 'libs/Mustache'], function (Backbone
             return this.$el;
         },
         showTask: function (evt) {
-            this.trigger('taskClicked', evt.currentTarget.hash);
+            var task = evt.currentTarget.hash;
+            this.trigger('taskClicked', task);
         }
     });
 });
