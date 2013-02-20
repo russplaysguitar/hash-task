@@ -14,16 +14,10 @@ define([
     'views/Posts',
     'views/Projects',
     'views/NewTask',
-    'views/Entity'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView) {
+    'views/Entity',
+    'utils/url'
+], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils) {
     'use strict';
-
-    // todo put this in lib shared with app_auth
-    // returns the value of a url parameter
-    var getURLParameter = function (name) {
-        // from: http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
-        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[null,""])[1].replace(/\+/g, '%20'))||null;
-    };
 
     var Router = Backbone.Router.extend({
         routes: {
@@ -112,7 +106,7 @@ define([
 
     // this is what is run by main.js
     return function () {
-        var state = getURLParameter('state');
+        var state = urlUtils.getURLParameter('state');
         if (state) {
             app_auth.finish(function () {
                 document.location.href = document.location.origin + document.location.pathname;
