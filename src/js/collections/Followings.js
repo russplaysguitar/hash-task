@@ -12,12 +12,12 @@ define(['backbone', 'underscore', 'collections/Post'], function (Backbone, _, Po
                     // fetch posts for each entity this user is following
                     var pending = collection.length;
                     collection.each(function (following) {
-                        pending--;
                         var entity = following.get('entity');
                         var followingPosts = new PostCollection();
                         followingPosts.url = entity + '/tent/posts';
                         followingPosts.fetch({
                             success: function (fpCollection) {
+                                pending--;
                                 self.trigger('gotMoreFollowings', fpCollection);
                                 if (!pending) {
                                     self.trigger('finishedFetchingFollowings');
