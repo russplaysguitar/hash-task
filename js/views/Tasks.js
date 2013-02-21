@@ -1,7 +1,7 @@
 /*global define*/
 
 // a list of tasks for a given project
-define(['backbone', 'underscore', 'jquery', 'libs/Mustache'], function (Backbone, _, $, Mustache) {
+define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone, _, $, Mustache) {
     'use strict';
     
     return Backbone.View.extend({
