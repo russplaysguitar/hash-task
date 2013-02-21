@@ -1,6 +1,6 @@
 /*global define*/
 
-// a list of posts for a given task
+// a list of posts for a given project or task
 define([
     'backbone', 'underscore', 'jquery', 'libs/mustache', 'views/Post'
 ], function (Backbone, _, $, Mustache, PostView) {
@@ -9,13 +9,21 @@ define([
     return Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
-        render: function (task) {
-            task = task ? task : null;
+        render: function (project, task) {
+            project = project || null;
+            task = task || null;
 
-            // get posts for task
+            // get posts for project
             var posts = this.collection.filter(function (post) {
-                return task && post.get('task') === task;
+                return project && post.get('project') === project;
             });
+
+            if (task) {
+                // get posts for task
+                posts = _.filter(posts, function (post) {
+                    return task && post.get('task') === task;
+                });
+            }
 
             // update DOM
             this.$el.html('');

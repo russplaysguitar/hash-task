@@ -14,7 +14,7 @@ define([
         },
         render: function () {
             // get list of project names
-            var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null');
+            var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null', 'undefined');
 
             // update DOM
             this.$el.html('');

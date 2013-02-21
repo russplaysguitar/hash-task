@@ -38,14 +38,14 @@ define([
             newTaskView.render();
             projectsView.render();
             tasksView.render(project);
-            postsView.render();
+            postsView.render(project);
         },
         task: function (project, task) {
             entityView.render();
             newTaskView.render();
             projectsView.render();
             tasksView.render(project);
-            postsView.render(task);
+            postsView.render(project, task);
         }
     });
     var router = new Router();
@@ -73,6 +73,13 @@ define([
     followingsCollection.on('finishedFetchingFollowings', function () {
         Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
+    postsCollection.on('labels_found', function () {
+        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
+    });
+
+    postsCollection.on('finished_fetch', function () {
+        followingsCollection.fetch();
+    });
 
     var newTaskView = new NewTaskView();
 
@@ -81,13 +88,15 @@ define([
         // whenever the entity changes, re-fetch all the posts
         var entity = newModel.get('entity');
         if (entity) {
-            postsCollection.url = newModel.get('entity') + '/tent/posts';
-            postsCollection.fetch();
-
+            newTaskView.render();// show "new task" form now that an entity has been chosen
+            
             followingsCollection.url = newModel.get('entity') + '/tent/followings';
-            followingsCollection.fetch();
-
-            newTaskView.render();
+            postsCollection.url = newModel.get('entity') + '/tent/posts';
+            postsCollection.fetch({
+                success: function () {
+                    postsCollection.trigger('finished_fetch');
+                }
+            });// will trigger followingsCollection.fetch() on success
         }
     });
 
@@ -109,7 +118,7 @@ define([
         }
 
         // start the app
-        Backbone.history.start();
+        Backbone.history.start();        
 
         // set the entity, which triggers posts lookup
         if (localStorage.entity) {
