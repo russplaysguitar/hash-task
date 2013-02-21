@@ -27,38 +27,42 @@ define([
             ':project/:task': 'task'
         },
         home: function () {
-            $('.tentEntity').html(entityView.render());
-            $('.newTask').html(newTaskView.render());
-            $('.projectsList').html(projectsView.render());
-            $('.tasksList').html('');
-            $('.postsList').html('');
+            entityView.render();
+            newTaskView.render();
+            projectsView.render();
+            tasksView.render();
+            postsView.render();
         },
         project: function (project) {
-            $('.tentEntity').html(entityView.render());
-            $('.newTask').html(newTaskView.render());
-            $('.projectsList').html(projectsView.render());
-            $('.tasksList').html(tasksView.render(project));
-            $('.postsList').html('');
+            entityView.render();
+            newTaskView.render();
+            projectsView.render();
+            tasksView.render(project);
+            postsView.render();
         },
         task: function (project, task) {
-            $('.tentEntity').html(entityView.render());
-            $('.newTask').html(newTaskView.render());
-            $('.projectsList').html(projectsView.render());
-            $('.tasksList').html(tasksView.render(project));
-            $('.postsList').html(postsView.render(task));
+            entityView.render();
+            newTaskView.render();
+            projectsView.render();
+            tasksView.render(project);
+            postsView.render(task);
         }
     });
     var router = new Router();
 
+    // all the posts are in this collection
     var postsCollection = new PostCollection();
+
     var projectsView = new ProjectsView({collection: postsCollection});
     projectsView.on('projectClicked', function (project) {
         router.navigate(project, {trigger:true});
     });
+
     var tasksView = new TasksView({collection: postsCollection});
     tasksView.on('taskClicked', function (location) {
         router.navigate(location, {trigger:true});
     });
+
     var postsView = new PostsView({collection: postsCollection});
 
     var followingsCollection = new FollowingsCollection();
@@ -71,6 +75,7 @@ define([
     });
 
     var newTaskView = new NewTaskView();
+
     var entityView = new EntityView();
     entityView.model.on('change:entity', function (newModel) {
         var entity = newModel.get('entity');
@@ -87,12 +92,22 @@ define([
 
     // this is what is run by main.js
     return function () {
+        // setup elements
+        $('.tentEntity').html(entityView.el);
+        $('.newTask').html(newTaskView.el);
+        $('.projectsList').html(projectsView.el);
+        $('.tasksList').html(tasksView.el);
+        $('.postsList').html(postsView.el);
+
+        // handle result from app authentication
         var state = urlUtils.getURLParameter('state');
         if (state) {
             app_auth.finish(function () {
                 document.location.href = document.location.origin + document.location.pathname;
             });
         }
+
+        // start the app
         Backbone.history.start();
         if (localStorage.entity) {
             entityView.model.set('entity', localStorage.entity);

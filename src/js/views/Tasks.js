@@ -10,10 +10,8 @@ define(['backbone', 'underscore', 'jquery', 'libs/Mustache'], function (Backbone
         events: {
             'click .btn': 'showTask'
         },
-        project: null,
         render: function (project) {
-            project = project ? project : this.project;
-            this.project = project;
+            project = project ? project : null;
 
             // get posts for project
             var posts = this.collection.filter(function (post) {

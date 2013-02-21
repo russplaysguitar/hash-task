@@ -9,14 +9,12 @@ define([
     return Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
-        task: null,
         render: function (task) {
-            task = task ? task : this.task;
-            this.task = task;
+            task = task ? task : null;
 
             // get posts for task
             var posts = this.collection.filter(function (post) {
-                return post.get('task') === task;
+                return task && post.get('task') === task;
             });
 
             // update DOM
