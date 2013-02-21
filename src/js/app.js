@@ -79,7 +79,7 @@ define([
             postsCollection.fetch();
 
             followingsCollection.url = newModel.get('entity') + '/tent/followings';
-            followingsCollection.fetch(followingsCollection.fetch_opts);
+            followingsCollection.fetch();
 
             newTaskView.render();
         }

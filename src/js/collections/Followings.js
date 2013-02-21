@@ -6,7 +6,7 @@ define(['backbone', 'underscore', 'collections/Post'], function (Backbone, _, Po
     'use strict';
     return Backbone.Collection.extend({
         initialize: function () {
-            this.fetch_opts = {
+            var fetch_opts = {
                 success: _.bind(function (collection) {
                     var self = this;
                     // fetch posts for each entity this user is following
@@ -27,6 +27,7 @@ define(['backbone', 'underscore', 'collections/Post'], function (Backbone, _, Po
                     });
                 }, this)
             };
+            this.fetch = _.partial(this.fetch, fetch_opts);
         }
     });
 });
