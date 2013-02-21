@@ -1,18 +1,18 @@
-/*global Backbone,_,$,sjcl*/
+/*global define*/
 
 // usage: call app_auth.auth(entity + '/tent') then call app_auth.finish()
-var app_auth = (function () {
+define([
+    'backbone',
+    'underscore',
+    'jquery',
+    'sjcl',
+    'utils/url'
+], function (Backbone,_,$,sjcl,urlUtils) {
     'use strict';
-
-    // returns the value of a url parameter
-    var getURLParameter = function (name) {
-        // from: http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
-        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[null,""])[1].replace(/\+/g, '%20'))||null;
-    };
 
     // prevents cross-site request forgery
     var validateState = function () {
-        var urlState = getURLParameter('state'),
+        var urlState = urlUtils.getURLParameter('state'),
             savedState = localStorage.AppState;
 
         if (urlState !== savedState) {
@@ -69,7 +69,7 @@ var app_auth = (function () {
                     'Authorization': 'MAC id="'+AppJSON.mac_key_id+'", ts="'+timestamp+'", nonce="'+nonce+'", mac="'+signature+'"'
                 },
                 data: JSON.stringify({
-                    code: getURLParameter('code'),
+                    code: urlUtils.getURLParameter('code'),
                     token_type: 'mac'
                 }),
                 success: function (data, textStatus, jqXHR) {
@@ -189,4 +189,4 @@ var app_auth = (function () {
             document.location.href = server + '/oauth/authorize?' + $.param(queryString);
         }
     };
-}());
+});
