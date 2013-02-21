@@ -78,6 +78,7 @@ define([
 
     var entityView = new EntityView();
     entityView.model.on('change:entity', function (newModel) {
+        // whenever the entity changes, re-fetch all the posts
         var entity = newModel.get('entity');
         if (entity) {
             postsCollection.url = newModel.get('entity') + '/tent/posts';
@@ -92,7 +93,7 @@ define([
 
     // this is what is run by main.js
     return function () {
-        // setup elements
+        // setup DOM elements
         $('.tentEntity').html(entityView.el);
         $('.newTask').html(newTaskView.el);
         $('.projectsList').html(projectsView.el);
@@ -109,6 +110,8 @@ define([
 
         // start the app
         Backbone.history.start();
+
+        // set the entity, which triggers posts lookup
         if (localStorage.entity) {
             entityView.model.set('entity', localStorage.entity);
         }
