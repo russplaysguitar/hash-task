@@ -11,7 +11,7 @@ define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostMod
                 this.trigger('labels_found');
             }, this));
             // find labels that reference projects (for posts without explicit project references)
-            var b = _.bind(function () {
+            _.defer(_.bind(function () {
                 var projects = this.groupBy('project');
                 var projectList = _.keys(projects);
 
@@ -23,8 +23,7 @@ define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostMod
                         trigger_labels_found();
                     }
                 });
-            }, this);
-            _.defer(b);
+            }, this));
 
             // only put status posts into the collection
             return _.filter(json, function (post) {
