@@ -5,7 +5,7 @@ define([
     'underscore',
     'jquery',
     'app_auth',
-    'models/Entity',
+    'models/Authentication',
     'collections/Post',
     'views/Tasks',
     'views/Post',
@@ -15,7 +15,7 @@ define([
     'views/Entity',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,EntityModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -88,16 +88,16 @@ define([
 
     var postsView = new PostsView({collection: allPostsCollection, el: $('.postsList')});
 
-    var entityModel = new EntityModel();
+    var authModel = new AuthenticationModel();
 
     var newTaskView = new NewTaskView({
         el: $('.newTask'),
-        model: entityModel
+        model: authModel
     });
 
     var entityView = new EntityView({
         el: $('.tentEntity'), 
-        model: entityModel
+        model: authModel
     });
 
     // this is what is run by main.js
@@ -106,7 +106,7 @@ define([
         // handle result from app authentication
         var state = urlUtils.getURLParameter('state');
         if (state) {
-            app_auth.finish(function () {
+            app_auth(authModel).finish(function () {
                 // get rid of url params
                 document.location.href = document.location.origin + document.location.pathname;
             });
@@ -116,14 +116,14 @@ define([
         // start the app
         Backbone.history.start();        
 
-        if (entityModel.get('entity') && entityModel.get('entity') !== '') {
+        if (authModel.get('entity') && authModel.get('entity') !== '' && authModel.get('AppJSON')) {
             // lookup posts and display new task form
             newTaskView.render();// show "new task" form now that an entity has been chosen
             
-            followingsCollection.url = entityModel.get('entity') + '/tent/followings';
+            followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
 
-            selfPostsCollection.url = entityModel.get('entity') + '/tent/posts';
+            selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
         }
     };

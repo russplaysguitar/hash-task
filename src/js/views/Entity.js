@@ -9,7 +9,8 @@ define([
         tagName: 'div',
         className: '',
         events: {
-            'click .btn': 'setEntity'
+            'click .login': 'setEntity',
+            'click .logout': 'unsetEntity'
         },
         render: function () {
             // update DOM
@@ -20,8 +21,12 @@ define([
             var entity = this.$('input').val();
             this.model.set('entity', entity);
             if (entity && entity !== '') {
-                app_auth.auth(entity + '/tent');
+                app_auth(this.model).auth(entity + '/tent');
             }
+        },
+        unsetEntity: function (evt) {
+            this.model.clear();
+            document.location.reload();
         }
     });
 });

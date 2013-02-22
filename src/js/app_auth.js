@@ -10,17 +10,19 @@ define([
 ], function (Backbone,_,$,sjcl,urlUtils) {
     'use strict';
 
+    var authModel = new Backbone.Model();// default model
+
     // prevents cross-site request forgery
     var validateState = function () {
         var urlState = urlUtils.getURLParameter('state'),
-            savedState = localStorage.AppState;
+            savedState = authModel.get('AppState');
 
         if (urlState !== savedState) {
             throw("CRSF warning");
         }
     };
 
-    return {
+    var functions = {
         // does steps 0 thru 3
         auth: function (entity) {
             // TODO: clean this up
@@ -39,8 +41,8 @@ define([
             // ensure valid response
             validateState();
 
-            var AppJSON = JSON.parse(localStorage.AppJSON);
-            var matches = /^(http|https):\/\/([.\d\w\-]+)/.exec(localStorage.entity);
+            var AppJSON = authModel.get('AppJSON');
+            var matches = /^(http|https):\/\/([.\d\w\-]+)/.exec(authModel.get('entity'));
             var host = matches[2];
 
             // prepare request string for hmac signature
@@ -74,7 +76,7 @@ define([
                 }),
                 success: function (data, textStatus, jqXHR) {
                     // save authorization data
-                    localStorage.AppJSON = JSON.stringify(data);
+                    authModel.set('AppJSON', data);
                     cb();
                 }
             });
@@ -125,7 +127,7 @@ define([
                 self.servers = coreData["servers"];
 
                 // might be different than the original entity
-                localStorage.entity = coreData["entity"];
+                authModel.set('entity', coreData["entity"]);
 
                 callback.apply(context, [data]);
             });
@@ -160,7 +162,7 @@ define([
                 },
                 data: JSON.stringify(data),
                 success: function (data, textStatus, jqXHR) {
-                    localStorage.AppJSON = JSON.stringify(data);
+                    authModel.set('AppJSON', data);
 
                     callback.apply(context, [data]);
                 }
@@ -173,14 +175,14 @@ define([
             var server = this.servers[0];
 
             // used to prevent CRSF
-            localStorage.AppState = Math.random().toString(36).substr(2,16);
+            authModel.set('AppState', Math.random().toString(36).substr(2,16));
 
             var queryString = {
-                client_id: JSON.parse(localStorage.AppJSON).id,
+                client_id: authModel.get('AppJSON').id,
                 redirect_uri: document.location.href,
                 scope: 'read_posts,write_posts',
                 response_type: 'code',
-                state: localStorage.AppState,
+                state: authModel.get('AppState'),
                 tent_profile_info_types: 'https://tent.io/types/info/basic/v0.1.0',
                 tent_post_types: 'https://tent.io/types/posts/status/v0.1.0'
             };
@@ -188,5 +190,11 @@ define([
             // redirect user to authentication page
             document.location.href = server + '/oauth/authorize?' + $.param(queryString);
         }
+    };
+
+    // authModel stores auth data
+    return function (authModel_in) {
+        authModel = authModel_in;
+        return functions;
     };
 });
