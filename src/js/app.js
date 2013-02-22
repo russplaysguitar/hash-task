@@ -53,17 +53,17 @@ define([
     // all the posts are in this collection
     var postsCollection = new PostCollection();
 
-    var projectsView = new ProjectsView({collection: postsCollection});
+    var projectsView = new ProjectsView({collection: postsCollection, el: $('.projectsList')});
     projectsView.on('projectClicked', function (project) {
         router.navigate(project, {trigger:true});
     });
 
-    var tasksView = new TasksView({collection: postsCollection});
+    var tasksView = new TasksView({collection: postsCollection, el: $('.tasksList')});
     tasksView.on('taskClicked', function (location) {
         router.navigate(location, {trigger:true});
     });
 
-    var postsView = new PostsView({collection: postsCollection});
+    var postsView = new PostsView({collection: postsCollection, el: $('.postsList')});
 
     var followingsCollection = new FollowingsCollection();
     followingsCollection.on('gotMoreFollowings', function (fpCollection) {
@@ -81,9 +81,9 @@ define([
         followingsCollection.fetch();
     });
 
-    var newTaskView = new NewTaskView();
+    var newTaskView = new NewTaskView({el: $('.newTask')});
 
-    var entityView = new EntityView();
+    var entityView = new EntityView({el: $('.tentEntity')});
     entityView.model.on('change:entity', function (newModel) {
         // whenever the entity changes, re-fetch all the posts
         var entity = newModel.get('entity');
@@ -102,18 +102,13 @@ define([
 
     // this is what is run by main.js
     return function () {
-        // setup DOM elements
-        $('.tentEntity').html(entityView.el);
-        $('.newTask').html(newTaskView.el);
-        $('.projectsList').html(projectsView.el);
-        $('.tasksList').html(tasksView.el);
-        $('.postsList').html(postsView.el);
 
         // handle result from app authentication
         var state = urlUtils.getURLParameter('state');
         if (state) {
             app_auth.finish(function () {
                 document.location.href = document.location.origin + document.location.pathname;
+                return; //don't start the app yet!
             });
         }
 
