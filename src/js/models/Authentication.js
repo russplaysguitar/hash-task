@@ -6,7 +6,8 @@ define(['backbone'], function (Backbone) {
         defaults: {
             AppJSON: JSON.parse(localStorage.AppJSON || '{}'),
             AppState: localStorage.AppState,
-            entity: localStorage.entity
+            entity: localStorage.entity,
+            isLoggedIn: JSON.parse(localStorage.isLoggedIn || false)
         },
         initialize: function (atts) {
             this.on('change', function (newModel) {
@@ -14,6 +15,7 @@ define(['backbone'], function (Backbone) {
                 localStorage.AppJSON = JSON.stringify(newModel.get('AppJSON') || {});
                 localStorage.AppState = newModel.get('AppState') || '';
                 localStorage.entity = newModel.get('entity') || '';
+                localStorage.isLoggedIn = JSON.stringify(newModel.get('isLoggedIn') || false);
             });
         },
         parse: function (response, options) {

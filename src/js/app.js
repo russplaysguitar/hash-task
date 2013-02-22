@@ -116,7 +116,7 @@ define([
         // start the app
         Backbone.history.start();        
 
-        if (authModel.get('entity') && authModel.get('entity') !== '' && authModel.get('AppJSON')) {
+        if (authModel.get('isLoggedIn')) {
             // lookup posts and display new task form
             newTaskView.render();// show "new task" form now that an entity has been chosen
             

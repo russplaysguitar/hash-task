@@ -12,7 +12,7 @@ define([
             'click .btn': 'newPost'
         },
         render: function () {
-            if (this.model.get('entity')) {
+            if (this.model.get('isLoggedIn')) {
                 // update DOM
                 this.$el.html(NewTaskTemplate);
             }

@@ -77,6 +77,7 @@ define([
                 success: function (data, textStatus, jqXHR) {
                     // save authorization data
                     authModel.set('AppJSON', data);
+                    authModel.set('isLoggedIn', true);
                     cb();
                 }
             });
