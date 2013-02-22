@@ -99,19 +99,6 @@ define([
         el: $('.tentEntity'), 
         model: entityModel
     });
-    entityView.model.on('change:entity', function (newModel) {
-        // whenever the entity changes, re-fetch all the posts
-        var entity = newModel.get('entity');
-        if (entity && entity !== '') {
-            newTaskView.render();// show "new task" form now that an entity has been chosen
-            
-            followingsCollection.url = newModel.get('entity') + '/tent/followings';
-            followingsCollection.fetch();
-
-            selfPostsCollection.url = newModel.get('entity') + '/tent/posts';
-            selfPostsCollection.fetch();
-        }
-    });
 
     // this is what is run by main.js
     return function () {
@@ -120,17 +107,24 @@ define([
         var state = urlUtils.getURLParameter('state');
         if (state) {
             app_auth.finish(function () {
+                // get rid of url params
                 document.location.href = document.location.origin + document.location.pathname;
-                return; //don't start the app yet!
             });
+            return; //don't start the app yet!
         }
 
         // start the app
         Backbone.history.start();        
 
-        // set the entity, which triggers posts lookup
-        if (localStorage.entity) {
-            entityView.model.set('entity', localStorage.entity);
+        if (entityModel.get('entity') && entityModel.get('entity') !== '') {
+            // lookup posts and display new task form
+            newTaskView.render();// show "new task" form now that an entity has been chosen
+            
+            followingsCollection.url = entityModel.get('entity') + '/tent/followings';
+            followingsCollection.fetch();
+
+            selfPostsCollection.url = entityModel.get('entity') + '/tent/posts';
+            selfPostsCollection.fetch();
         }
     };
 });

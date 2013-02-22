@@ -4,7 +4,7 @@ define(['backbone'], function (Backbone){
     'use strict';
     return Backbone.Model.extend({
         defaults: {
-            entity: ''
+            entity: localStorage.entity || ''
         },
         initialize: function (atts) {
             this.on('change:entity', function (newModel) {
