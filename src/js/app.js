@@ -20,25 +20,11 @@ define([
 
     var Router = Backbone.Router.extend({
         routes: {
-            '': 'home',
-            ':project': 'project',
-            ':project/:task': 'task'
+            '': 'everything',
+            ':project': 'everything',
+            ':project/:task': 'everything'
         },
-        home: function () {
-            entityView.render();
-            newTaskView.render();
-            projectsView.render();
-            tasksView.render();
-            postsView.render();
-        },
-        project: function (project) {
-            entityView.render();
-            newTaskView.render();
-            projectsView.render();
-            tasksView.render(project);
-            postsView.render(project);
-        },
-        task: function (project, task) {
+        everything: function (project, task) {
             entityView.render();
             newTaskView.render();
             projectsView.render();
