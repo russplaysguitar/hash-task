@@ -108,7 +108,7 @@ define([
         if (state) {
             app_auth(authModel).finish(function () {
                 // get rid of url params
-                document.location.href = document.location.origin + document.location.pathname;
+                document.location.href = document.location.origin + document.location.pathname + document.location.hash;
             });
             return; //don't start the app yet!
         }
