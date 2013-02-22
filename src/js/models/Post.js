@@ -5,6 +5,13 @@ define(['backbone'], function (Backbone){
     'use strict';
     
     return Backbone.Model.extend({
+        defaults: {
+            // user: null,
+            // project: null,
+            // task: null,
+            // status: null,
+            // labels: []
+        },
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
         statusPattern: /\#(open|assign|close)/i,
         labelPattern: /\#([\w_\d]+)/gi,

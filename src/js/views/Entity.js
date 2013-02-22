@@ -13,7 +13,7 @@ define([
         },
         render: function () {
             // update DOM
-            this.$el.html(Mustache.render(entityTemplate, this.model.toJSON() ));
+            this.$el.html(Mustache.render( entityTemplate, this.model.toJSON() ));
             return this.$el;
         },
         setEntity: function (evt) {
