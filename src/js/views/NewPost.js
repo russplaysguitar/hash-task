@@ -1,8 +1,8 @@
 /*global define*/
 
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth', 'text!templates/new_task.html'
-], function (Backbone, _, $, Mustache, app_auth, NewTaskTemplate) {
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth', 'libs/bootstrap', 'text!templates/new_post.html'
+], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate) {
     'use strict';
     
     return Backbone.View.extend({
@@ -11,10 +11,19 @@ define([
         events: {
             'click .btn': 'newPost'
         },
+        initialize: function (options) {
+            this.source = options.source;
+        },
         render: function () {
             if (this.model.get('isLoggedIn')) {
                 // update DOM
-                this.$el.html(NewTaskTemplate);
+                this.$el.html(NewPostTemplate);
+                
+                var projects = _.keys(this.source.groupBy('project'));
+                this.$('.projectName').typeahead({source: projects});
+
+                var tasks = _.keys(this.source.groupBy('task'));
+                this.$('.taskName').typeahead({source: tasks});
             }
             else {
                 this.$el.html('');

@@ -11,11 +11,11 @@ define([
     'views/Post',
     'views/Posts',
     'views/Projects',
-    'views/NewTask',
+    'views/NewPost',
     'views/Entity',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -76,9 +76,10 @@ define([
 
     var authModel = new AuthenticationModel();
 
-    var newTaskView = new NewTaskView({
+    var newTaskView = new NewPostView({
         el: $('.newTask'),
-        model: authModel
+        model: authModel,
+        source: allPostsCollection
     });
 
     var entityView = new EntityView({
