@@ -9,6 +9,11 @@ define([
     return Backbone.View.extend({
         tagName: 'div',
         className: 'tasks',
+        initialize: function (options) {
+            // options.collection.on('change', function () { 
+            //     this.render();
+            // }, this);
+        },
         render: function (project, task) {
             project = project || null;
             task = task || null;

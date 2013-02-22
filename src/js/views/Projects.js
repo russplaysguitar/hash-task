@@ -12,6 +12,11 @@ define([
         events: {
             'click .btn': 'showProject'
         },
+        initialize: function (options) {
+            // options.collection.on('change', function () { 
+            //     this.render();
+            // }, this);
+        },
         render: function () {
             // get list of project names
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null', 'undefined');

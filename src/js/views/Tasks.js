@@ -10,6 +10,11 @@ define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone
         events: {
             'click .btn': 'showTask'
         },
+        initialize: function (options) {
+            // options.collection.on('change', function () { 
+            //     this.render();
+            // }, this);
+        },
         render: function (project) {
             project = project ? project : null;
 
