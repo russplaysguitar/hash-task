@@ -117,9 +117,7 @@ define([
         Backbone.history.start();        
 
         if (authModel.get('isLoggedIn')) {
-            // lookup posts and display new task form
-            newTaskView.render();// show "new task" form now that an entity has been chosen
-            
+            // lookup posts now
             followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
 
