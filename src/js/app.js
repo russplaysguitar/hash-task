@@ -48,8 +48,12 @@ define([
     });
     var router = new Router();
 
-    // all the posts are in this collection
+    // all the posts are put into this collection
     var allPostsCollection = new PostCollection();
+    allPostsCollection.on('add', function () {
+        // refresh page when new posts are added to the collection
+        Backbone.history.loadUrl(Backbone.history.fragment);
+    });
 
     // just posts from the chosen entity
     var selfPostsCollection = new PostCollection();
@@ -62,28 +66,15 @@ define([
     followingsCollection.on('reset', function (collection) {
         var self = this;
         // fetch posts for each entity this user is following
-        var pending = collection.length;
         collection.each(function (following) {
             var entity = following.get('entity');
             var followingPosts = new PostCollection();
             followingPosts.url = entity + '/tent/posts';
             followingPosts.on('reset', function (fpCollection) {
-                pending--;
-                self.trigger('gotMoreFollowings', fpCollection);
-                if (!pending) {
-                    self.trigger('finishedFetchingFollowings');
-                }
+                allPostsCollection.add(fpCollection.models);
             });
             followingPosts.fetch();
         });        
-    });
-
-    followingsCollection.on('gotMoreFollowings', function (fpCollection) {
-        // add the new posts to the main posts collection
-        allPostsCollection.add(fpCollection.models);
-    });
-    followingsCollection.on('finishedFetchingFollowings', function () {
-        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
 
     var projectsView = new ProjectsView({collection: allPostsCollection, el: $('.projectsList')});
