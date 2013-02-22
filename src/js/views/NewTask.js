@@ -12,7 +12,7 @@ define([
             'click .btn': 'newPost'
         },
         render: function () {
-            if (localStorage.entity) {
+            if (this.model.get('entity')) {
                 // update DOM
                 this.$el.html(NewTaskTemplate);
             }

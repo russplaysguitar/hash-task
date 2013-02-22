@@ -11,11 +11,6 @@ define([
         events: {
             'click .btn': 'setEntity'
         },
-        initialize: function () {
-            this.model = new Backbone.Model({
-                entity: ''
-            });
-        },
         render: function () {
             // update DOM
             this.$el.html(Mustache.render(entityTemplate, { entity: this.model.get('entity')} ));
@@ -24,9 +19,9 @@ define([
         setEntity: function (evt) {
             var entity = this.$('input').val();
             this.model.set('entity', entity);
-            localStorage.entity = entity;
-            app_auth.auth(entity + '/tent');
-            return false;
+            if (entity && entity !== '') {
+                app_auth.auth(entity + '/tent');
+            }
         }
     });
 });

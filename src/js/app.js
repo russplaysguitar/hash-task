@@ -4,10 +4,8 @@ define([
     'backbone',
     'underscore',
     'jquery',
-    'libs/mustache',
-    'sjcl',
     'app_auth',
-    'models/Post',
+    'models/Entity',
     'collections/Post',
     'views/Tasks',
     'views/Post',
@@ -17,7 +15,7 @@ define([
     'views/Entity',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,EntityModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -100,13 +98,21 @@ define([
 
     var postsView = new PostsView({collection: allPostsCollection, el: $('.postsList')});
 
-    var newTaskView = new NewTaskView({el: $('.newTask')});
+    var entityModel = new EntityModel();
 
-    var entityView = new EntityView({el: $('.tentEntity')});
+    var newTaskView = new NewTaskView({
+        el: $('.newTask'),
+        model: entityModel
+    });
+
+    var entityView = new EntityView({
+        el: $('.tentEntity'), 
+        model: entityModel
+    });
     entityView.model.on('change:entity', function (newModel) {
         // whenever the entity changes, re-fetch all the posts
         var entity = newModel.get('entity');
-        if (entity) {
+        if (entity && entity !== '') {
             newTaskView.render();// show "new task" form now that an entity has been chosen
             
             followingsCollection.url = newModel.get('entity') + '/tent/followings';
