@@ -51,32 +51,54 @@ define([
     var router = new Router();
 
     // all the posts are in this collection
-    var postsCollection = new PostCollection();
+    var allPostsCollection = new PostCollection();
 
-    var projectsView = new ProjectsView({collection: postsCollection, el: $('.projectsList')});
-    projectsView.on('projectClicked', function (project) {
-        router.navigate(project, {trigger:true});
+    // just posts from the chosen entity
+    var selfPostsCollection = new PostCollection();
+    selfPostsCollection.on('reset', function (collection) {
+        allPostsCollection.add(collection.models);
     });
 
-    var tasksView = new TasksView({collection: postsCollection, el: $('.tasksList')});
-    tasksView.on('taskClicked', function (location) {
-        router.navigate(location, {trigger:true});
-    });
-
-    var postsView = new PostsView({collection: postsCollection, el: $('.postsList')});
-
+    // posts from entity followings
     var followingsCollection = new FollowingsCollection();
+    followingsCollection.on('reset', function (collection) {
+        var self = this;
+        // fetch posts for each entity this user is following
+        var pending = collection.length;
+        collection.each(function (following) {
+            var entity = following.get('entity');
+            var followingPosts = new PostCollection();
+            followingPosts.url = entity + '/tent/posts';
+            followingPosts.on('reset', function (fpCollection) {
+                pending--;
+                self.trigger('gotMoreFollowings', fpCollection);
+                if (!pending) {
+                    self.trigger('finishedFetchingFollowings');
+                }
+            });
+            followingPosts.fetch();
+        });        
+    });
+
     followingsCollection.on('gotMoreFollowings', function (fpCollection) {
         // add the new posts to the main posts collection
-        postsCollection.add(fpCollection.models);
+        allPostsCollection.add(fpCollection.models);
     });
     followingsCollection.on('finishedFetchingFollowings', function () {
         Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
 
-    postsCollection.on('finished_fetch', function () {
-        followingsCollection.fetch();
+    var projectsView = new ProjectsView({collection: allPostsCollection, el: $('.projectsList')});
+    projectsView.on('projectClicked', function (project) {
+        router.navigate(project, {trigger:true});
     });
+
+    var tasksView = new TasksView({collection: allPostsCollection, el: $('.tasksList')});
+    tasksView.on('taskClicked', function (location) {
+        router.navigate(location, {trigger:true});
+    });
+
+    var postsView = new PostsView({collection: allPostsCollection, el: $('.postsList')});
 
     var newTaskView = new NewTaskView({el: $('.newTask')});
 
@@ -88,12 +110,10 @@ define([
             newTaskView.render();// show "new task" form now that an entity has been chosen
             
             followingsCollection.url = newModel.get('entity') + '/tent/followings';
-            postsCollection.url = newModel.get('entity') + '/tent/posts';
-            postsCollection.fetch({
-                success: function () {
-                    postsCollection.trigger('finished_fetch');
-                }
-            });// will trigger followingsCollection.fetch() on success
+            followingsCollection.fetch();
+
+            selfPostsCollection.url = newModel.get('entity') + '/tent/posts';
+            selfPostsCollection.fetch();
         }
     });
 

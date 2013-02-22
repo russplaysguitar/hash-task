@@ -26,11 +26,6 @@ define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostMod
             return _.filter(json, function (post) {
                 return post.type === 'https://tent.io/types/post/status/v0.1.0';
             });
-        },
-        byTaskForProject: function (projectName) {// useful??
-            return _.groupBy(this.groupBy('project')[projectName], function (model) {
-                return model.get('task');
-            }, this);
         }
     });
  });
