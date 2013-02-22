@@ -13,8 +13,17 @@ define([
             'click .logout': 'unsetEntity'
         },
         render: function () {
+            var entity = this.model.get('entity');
             // update DOM
-            this.$el.html(Mustache.render( entityTemplate, this.model.toJSON() ));
+            var rendered = Mustache.render(entityTemplate, this.model.toJSON());
+            var $rendered = $(rendered);
+            if (entity && entity !== '') {
+                $rendered.find('.login').hide();
+            }
+            else {
+                $rendered.find('.logout').hide();
+            }
+            this.$el.html($rendered);
             return this.$el;
         },
         setEntity: function (evt) {
