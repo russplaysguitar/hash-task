@@ -13,14 +13,16 @@ define([
             'click .logout': 'unsetEntity'
         },
         render: function () {
-            var entity = this.model.get('entity');
+            var isLoggedIn = this.model.get('isLoggedIn');
             // update DOM
             var rendered = Mustache.render(entityTemplate, this.model.toJSON());
             var $rendered = $(rendered);
-            if (entity && entity !== '') {
+            if (isLoggedIn) {
                 $rendered.find('.login').hide();
+                $rendered.find('.logout').show();
             }
             else {
+                $rendered.find('.login').show();
                 $rendered.find('.logout').hide();
             }
             this.$el.html($rendered);
