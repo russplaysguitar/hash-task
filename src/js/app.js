@@ -73,9 +73,6 @@ define([
     followingsCollection.on('finishedFetchingFollowings', function () {
         Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
     });
-    postsCollection.on('labels_found', function () {
-        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
-    });
 
     postsCollection.on('finished_fetch', function () {
         followingsCollection.fetch();

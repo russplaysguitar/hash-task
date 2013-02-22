@@ -10,9 +10,9 @@ define([
         tagName: 'div',
         className: 'tasks',
         initialize: function (options) {
-            // options.collection.on('change', function () { 
-            //     this.render();
-            // }, this);
+            options.collection.on('change', function () { 
+                this.render();
+            }, this);
         },
         render: function (project, task) {
             project = project || null;
