@@ -9,24 +9,24 @@ define([
         tagName: 'div',
         className: '',
         events: {
-            'click .btn': 'setEntity'
-        },
-        initialize: function () {
-            this.model = new Backbone.Model({
-                entity: ''
-            });
+            'click .login': 'setEntity',
+            'click .logout': 'unsetEntity'
         },
         render: function () {
             // update DOM
-            this.$el.html(Mustache.render(entityTemplate, { entity: this.model.get('entity')} ));
+            this.$el.html(Mustache.render( entityTemplate, this.model.toJSON() ));
             return this.$el;
         },
         setEntity: function (evt) {
             var entity = this.$('input').val();
             this.model.set('entity', entity);
-            localStorage.entity = entity;
-            app_auth.auth(entity + '/tent');
-            return false;
+            if (entity && entity !== '') {
+                app_auth(this.model).auth(entity + '/tent');
+            }
+        },
+        unsetEntity: function (evt) {
+            this.model.clear();
+            document.location.reload();
         }
     });
 });

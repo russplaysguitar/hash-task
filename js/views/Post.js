@@ -8,11 +8,8 @@ define(['backbone', 'jquery', 'libs/mustache'], function (Backbone, $, Mustache)
         tagName: 'blockquote',
         className: 'post',
         render: function () {
-            var template = '<p>{{ text }}</p><small>{{ user }}</small>';
-            this.$el.html(Mustache.render(template, {
-                text: this.model.get('content').text,
-                user: this.model.get('user')
-            }));
+            var template = '<p>{{ content.text }}</p><small>{{ user }}</small>';
+            this.$el.html(Mustache.render(template, this.model.toJSON()));
 
             return this.$el;
         }

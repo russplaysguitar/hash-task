@@ -4,10 +4,8 @@ define([
     'backbone',
     'underscore',
     'jquery',
-    'libs/mustache',
-    'sjcl',
     'app_auth',
-    'models/Post',
+    'models/Authentication',
     'collections/Post',
     'views/Tasks',
     'views/Post',
@@ -17,7 +15,7 @@ define([
     'views/Entity',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,Mustache,sjcl,app_auth,PostModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -50,79 +48,81 @@ define([
     });
     var router = new Router();
 
-    // all the posts are in this collection
-    var postsCollection = new PostCollection();
+    // all the posts are put into this collection
+    var allPostsCollection = new PostCollection();
+    allPostsCollection.on('add', function () {
+        // refresh page when new posts are added to the collection
+        Backbone.history.loadUrl(Backbone.history.fragment);
+    });
 
-    var projectsView = new ProjectsView({collection: postsCollection});
+    // just posts from the chosen entity
+    var selfPostsCollection = new PostCollection();
+    selfPostsCollection.on('reset', function (collection) {
+        allPostsCollection.add(collection.models);
+    });
+
+    // posts from entity followings
+    var followingsCollection = new FollowingsCollection();
+    followingsCollection.on('reset', function (collection) {
+        // fetch posts for each entity this user is following
+        collection.each(function (following) {
+            var entity = following.get('entity');
+            var followingPosts = new PostCollection();
+            followingPosts.url = entity + '/tent/posts';
+            followingPosts.on('reset', function (fpCollection) {
+                allPostsCollection.add(fpCollection.models);
+            });
+            followingPosts.fetch();
+        });        
+    });
+
+    var projectsView = new ProjectsView({collection: allPostsCollection, el: $('.projectsList')});
     projectsView.on('projectClicked', function (project) {
         router.navigate(project, {trigger:true});
     });
 
-    var tasksView = new TasksView({collection: postsCollection});
+    var tasksView = new TasksView({collection: allPostsCollection, el: $('.tasksList')});
     tasksView.on('taskClicked', function (location) {
         router.navigate(location, {trigger:true});
     });
 
-    var postsView = new PostsView({collection: postsCollection});
+    var postsView = new PostsView({collection: allPostsCollection, el: $('.postsList')});
 
-    var followingsCollection = new FollowingsCollection();
-    followingsCollection.on('gotMoreFollowings', function (fpCollection) {
-        // add the new posts to the main posts collection
-        postsCollection.add(fpCollection.models);
-    });
-    followingsCollection.on('finishedFetchingFollowings', function () {
-        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
-    });
-    postsCollection.on('labels_found', function () {
-        Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
+    var authModel = new AuthenticationModel();
+
+    var newTaskView = new NewTaskView({
+        el: $('.newTask'),
+        model: authModel
     });
 
-    postsCollection.on('finished_fetch', function () {
-        followingsCollection.fetch();
-    });
-
-    var newTaskView = new NewTaskView();
-
-    var entityView = new EntityView();
-    entityView.model.on('change:entity', function (newModel) {
-        // whenever the entity changes, re-fetch all the posts
-        var entity = newModel.get('entity');
-        if (entity) {
-            newTaskView.render();// show "new task" form now that an entity has been chosen
-            
-            followingsCollection.url = newModel.get('entity') + '/tent/followings';
-            postsCollection.url = newModel.get('entity') + '/tent/posts';
-            postsCollection.fetch({
-                success: function () {
-                    postsCollection.trigger('finished_fetch');
-                }
-            });// will trigger followingsCollection.fetch() on success
-        }
+    var entityView = new EntityView({
+        el: $('.tentEntity'), 
+        model: authModel
     });
 
     // this is what is run by main.js
     return function () {
-        // setup DOM elements
-        $('.tentEntity').html(entityView.el);
-        $('.newTask').html(newTaskView.el);
-        $('.projectsList').html(projectsView.el);
-        $('.tasksList').html(tasksView.el);
-        $('.postsList').html(postsView.el);
 
         // handle result from app authentication
         var state = urlUtils.getURLParameter('state');
         if (state) {
-            app_auth.finish(function () {
-                document.location.href = document.location.origin + document.location.pathname;
+            app_auth(authModel).finish(function () {
+                // get rid of url params
+                document.location.href = document.location.origin + document.location.pathname + document.location.hash;
             });
+            return; //don't start the app yet!
         }
 
         // start the app
         Backbone.history.start();        
 
-        // set the entity, which triggers posts lookup
-        if (localStorage.entity) {
-            entityView.model.set('entity', localStorage.entity);
+        if (authModel.get('isLoggedIn')) {
+            // lookup posts now
+            followingsCollection.url = authModel.get('entity') + '/tent/followings';
+            followingsCollection.fetch();
+
+            selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
+            selfPostsCollection.fetch();
         }
     };
 });
