@@ -142,7 +142,7 @@ define([
             var data = {
               "name": "hash-task",
               "description": "Collaborative issue tracking",
-              "url": document.location.host + document.location.pathname,
+              "url": document.location.origin + document.location.pathname,
               "redirect_uris": [
                 document.location.href
               ],
