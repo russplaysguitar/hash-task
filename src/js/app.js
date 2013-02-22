@@ -64,7 +64,6 @@ define([
     // posts from entity followings
     var followingsCollection = new FollowingsCollection();
     followingsCollection.on('reset', function (collection) {
-        var self = this;
         // fetch posts for each entity this user is following
         collection.each(function (following) {
             var entity = following.get('entity');
