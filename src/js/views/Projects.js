@@ -2,8 +2,8 @@
 
 // a list of projects
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache'
-], function (Backbone, _, $, Mustache) {
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'text!templates/projects.html'
+], function (Backbone, _, $, Mustache, ProjectsTemplate) {
     'use strict';
     
     return Backbone.View.extend({
@@ -18,15 +18,13 @@ define([
             // }, this);
         },
         render: function () {
-            // get list of project names
+            // get list of project names as {name: project}
             var projectNames = _.without(_.keys(this.collection.groupBy('project')), 'null', 'undefined');
+            projectNames = _.map(projectNames, function (project) {
+                return {name: project};
+            });
 
-            // update DOM
-            this.$el.html('');
-            var template = '<a href="#{{ name }}" class="btn btn-primary">{{ name }}</a> ';
-            _.each(projectNames, function (name) {
-                this.$el.append(Mustache.render(template, {name: name}));
-            }, this);
+            this.$el.html(Mustache.render(ProjectsTemplate, {projectNames: projectNames}));
 
             return this.$el;
         },
