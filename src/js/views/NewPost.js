@@ -26,19 +26,16 @@ define([
         },
         render: function () {
             var self = this;
-            if (this.authModel.get('isLoggedIn')) {
+
+            if (!this.alreadyRendered) {
                 // update DOM
                 var rendered = Mustache.render(NewPostTemplate, this.model.toJSON());
                 this.$el.html(rendered);
-                
-                // update
-                this.updateTaskNameField();
 
                 // set up typeahead
-                var projects = _.keys(this.allPosts.groupBy('project'));
-                this.$('.project').typeahead({source: projects});
+                this.$('.project').typeahead({source: _.bind(this.getProjects, this)});
                 this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
-                
+                         
                 // setup model/field bindings
                 this.$('.comment').change(function () {
                     self.model.set('content', {text: $(this).val()});
@@ -50,9 +47,17 @@ define([
                     self.model.set('task', $(this).val());
                 });
 
+                this.alreadyRendered = true;
+            }
+
+            // update taskName field disabledness
+            this.updateTaskNameField();
+
+            // hide or show depending on logged in status      
+            if (this.authModel.get('isLoggedIn') && !this.$el.is(':visible')) {
                 this.$el.show();
             }
-            else {
+            else if(!this.authModel.get('isLoggedIn') && this.$el.is(':visible')) {
                 this.$el.hide();
             }
             return this.$el;
@@ -92,15 +97,19 @@ define([
             });
         },
         updateTaskNameField: function (evt) {
-            var projectName = this.$('.project').val();
+            var projectName = this.$('.project').val(),
+                isDisabled = !!this.$('.task').attr('disabled');
 
-            if (projectName.length > 0) {
+            if (projectName.length > 0 && isDisabled) {
                 this.$('.task').removeAttr('disabled');
             }
-            else {
+            else if (projectName.length === 0 && !isDisabled) {
                 this.$('.task').val('');
                 this.$('.task').attr('disabled', 'disabled');
             }
+        },
+        getProjects: function () {
+            return _.without(_.keys(this.allPosts.groupBy('project')), 'null');
         },
         getProjectTasks: function () {
             // TODO: implement some sort of caching, since this is called on each tasks field keypress
@@ -112,7 +121,7 @@ define([
             var tasks = _.keys(_.groupBy(postsForProject, function (post) {
                 return post.get('task');
             }));
-            return tasks;
+            return _.without(tasks, 'null');
         }
     });
 });
