@@ -1,32 +1,57 @@
 /*global define*/
 
 define([
-    'backbone', 'underscore', 'jquery', 'libs/mustache', 'app_auth', 'libs/bootstrap', 'text!templates/new_post.html'
-], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate) {
+    'backbone', 
+    'underscore', 
+    'jquery', 
+    'libs/mustache', 
+    'app_auth', 
+    'libs/bootstrap', 
+    'text!templates/new_post.html',
+    'models/Post'
+], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate, PostModel) {
     'use strict';
     
     return Backbone.View.extend({
         tagName: 'div',
         className: '',
         events: {
-            'click .btn': 'newPost'
+            'click .btn': 'newPost',
+            'focusout .project': 'updateTaskNameField'
         },
         initialize: function (options) {
             this.source = options.source;
+            this.authModel = options.authModel;
+            this.model = new PostModel();
         },
         render: function () {
-            if (this.model.get('isLoggedIn')) {
+            var self = this;
+            if (this.authModel.get('isLoggedIn')) {
                 // update DOM
-                this.$el.html(NewPostTemplate);
+                var rendered = Mustache.render(NewPostTemplate, this.model.toJSON());
+                this.$el.html(rendered);
                 
-                var projects = _.keys(this.source.groupBy('project'));
-                this.$('.projectName').typeahead({source: projects});
+                // update
+                this.updateTaskNameField();
 
-                var tasks = _.keys(this.source.groupBy('task'));
-                this.$('.taskName').typeahead({source: tasks});
+                // set up typeahead
+                var projects = _.keys(this.source.groupBy('project'));
+                this.$('.project').typeahead({source: projects});
+                this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
+                
+                // setup model/field bindings
+                this.$('.comment').change(function () {
+                    self.model.set('content', {text: $(this).val()});
+                });
+                this.$('.project').change(function () {
+                    self.model.set('project', $(this).val());
+                });
+                this.$('.task').change(function () {
+                    self.model.set('task', $(this).val());
+                });
             }
             else {
-                this.$el.html('');
+                this.$el.hide();
             }
             return this.$el;
         },
@@ -54,10 +79,33 @@ define([
                     "text": this.$('.comment').val()
                 }
             };
-            app_auth(this.model).auth_ajax(request, data, function () {
+            app_auth(this.authModel).auth_ajax(request, data, function () {
                 self.$('.comment').val('');
                 Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
             });
+        },
+        updateTaskNameField: function (evt) {
+            var projectName = this.$('.project').val();
+
+            if (projectName.length > 0) {
+                this.$('.task').removeAttr('disabled');
+            }
+            else {
+                this.$('.task').val('');
+                this.$('.task').attr('disabled', 'disabled');
+            }
+        },
+        getProjectTasks: function () {
+            // TODO: implement some sort of caching, since this is called on each tasks field keypress
+            //       (maybe break this View up into multiple views that share models?)
+            var projectName = this.$('.project').val();
+            var postsForProject = this.source.filter(function (post) {
+                return post.get('project') === projectName;
+            });
+            var tasks = _.keys(_.groupBy(postsForProject, function (post) {
+                return post.get('task');
+            }));
+            return tasks;
         }
     });
 });

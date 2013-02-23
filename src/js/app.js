@@ -26,7 +26,7 @@ define([
         },
         everything: function (project, task) {
             entityView.render();
-            newTaskView.render();
+            newPostView.render();
             projectsView.render();
             tasksView.render(project);
             postsView.render(project, task);
@@ -76,9 +76,9 @@ define([
 
     var authModel = new AuthenticationModel();
 
-    var newTaskView = new NewPostView({
+    var newPostView = new NewPostView({
         el: $('.newTask'),
-        model: authModel,
+        authModel: authModel,
         source: allPostsCollection
     });
 

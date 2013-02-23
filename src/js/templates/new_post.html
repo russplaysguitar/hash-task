@@ -1,8 +1,8 @@
 <form action="javascript:;" class="form-horizontal">
     <div class="control-group">
-        <textarea class="comment" name="comment" placeholder="Comment" required></textarea><br />
-        <input class="projectName" type="text" data-provide="typeahead" placeholder="Project Name">
-        <input class="taskName" type="text" data-provide="typeahead" placeholder="Task Name">
+        <textarea class="comment" name="comment" placeholder="Comment" required>{{ content.text }}</textarea><br />
+        <input class="project" type="text" data-provide="typeahead" placeholder="Project Name" autocomplete="off" value="{{ project }}">
+        <input class="task" type="text" data-provide="typeahead" placeholder="Task Name" autocomplete="off" disabled="disabled" value="{{ task }}">
         <button type="button" class="btn btn-inverse">Post</button>
     </div>
 </form>

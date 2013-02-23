@@ -10,7 +10,10 @@ define(['backbone'], function (Backbone){
             project: null,
             task: null,
             status: null,
-            labels: []
+            labels: [],
+            content: {
+                text: null
+            }
         },
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
         statusPattern: /\#(open|assign|close)/i,
