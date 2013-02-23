@@ -77,7 +77,7 @@ define([
     var authModel = new AuthenticationModel();
 
     var newPostView = new NewPostView({
-        el: $('.newTask'),
+        el: $('.newPost'),
         authModel: authModel,
         allPosts: allPostsCollection
     });
