@@ -1,7 +1,9 @@
 /*global define*/
 
 // a list of tasks for a given project
-define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone, _, $, Mustache) {
+define([
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'text!templates/tasks.html'
+], function (Backbone, _, $, Mustache, TasksTemplate) {
     'use strict';
     
     return Backbone.View.extend({
@@ -28,14 +30,14 @@ define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone
                 return post.get('task'); })), 'null');
 
             // update DOM
-            this.$el.html('');
-            var template = '<a href="{{ location }}" class="btn btn-success">{{ task }}</a> ';
             var locParts = document.location.hash.split('/');
+            var tasksData = [];
             _.each(tasks, function (task) {
                 locParts[1] = task;
                 var data = {location: locParts.join('/'), task: task};
-                this.$el.append(Mustache.render(template, data));
+                tasksData.push(data);
             }, this);
+            this.$el.html(Mustache.render(TasksTemplate, {tasks: tasksData}));
 
             return this.$el;
         },
