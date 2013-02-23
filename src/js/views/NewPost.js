@@ -17,10 +17,10 @@ define([
         className: '',
         events: {
             'click .btn': 'newPost',
-            'focusout .project': 'updateTaskNameField'
+            'change .project': 'updateTaskNameField'
         },
         initialize: function (options) {
-            this.source = options.source;
+            this.allPosts = options.allPosts;
             this.authModel = options.authModel;
             this.model = new PostModel();
         },
@@ -35,7 +35,7 @@ define([
                 this.updateTaskNameField();
 
                 // set up typeahead
-                var projects = _.keys(this.source.groupBy('project'));
+                var projects = _.keys(this.allPosts.groupBy('project'));
                 this.$('.project').typeahead({source: projects});
                 this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
                 
@@ -68,6 +68,8 @@ define([
                 method: 'POST',
                 path: '/tent/posts'
             };
+
+            var text = Mustache.render('{{ content.text }} #{{ project }}/{{ task }}', this.model.toJSON());
             var data = {
                 "type": "https://tent.io/types/post/status/v0.1.0",
                 "published_at": timestamp,
@@ -78,12 +80,15 @@ define([
                     "http://creativecommons.org/licenses/by/3.0/"
                 ],
                 "content": {
-                    "text": this.$('.comment').val()
+                    "text": text
                 }
             };
+
+            // make new post request
             app_auth(this.authModel).auth_ajax(request, data, function () {
-                self.$('.comment').val('');
-                Backbone.history.loadUrl(Backbone.history.fragment);// refresh page 
+                // on success...
+                self.model.clear();
+                self.trigger('posted');
             });
         },
         updateTaskNameField: function (evt) {
@@ -101,7 +106,7 @@ define([
             // TODO: implement some sort of caching, since this is called on each tasks field keypress
             //       (maybe break this View up into multiple views that share models?)
             var projectName = this.$('.project').val();
-            var postsForProject = this.source.filter(function (post) {
+            var postsForProject = this.allPosts.filter(function (post) {
                 return post.get('project') === projectName;
             });
             var tasks = _.keys(_.groupBy(postsForProject, function (post) {

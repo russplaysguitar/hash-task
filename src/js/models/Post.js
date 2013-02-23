@@ -13,7 +13,8 @@ define(['backbone'], function (Backbone){
             labels: [],
             content: {
                 text: null
-            }
+            },
+            published_at: null
         },
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
         statusPattern: /\#(open|assign|close)/i,

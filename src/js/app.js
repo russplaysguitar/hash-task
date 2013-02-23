@@ -79,7 +79,10 @@ define([
     var newPostView = new NewPostView({
         el: $('.newTask'),
         authModel: authModel,
-        source: allPostsCollection
+        allPosts: allPostsCollection
+    });
+    newPostView.on('posted', function () {
+        selfPostsCollection.fetch();
     });
 
     var entityView = new EntityView({
