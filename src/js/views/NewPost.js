@@ -65,7 +65,7 @@ define([
                 path: '/tent/posts'
             };
 
-            var text = Mustache.render('{{ content.text }} #{{ project }}/{{ task }}', this.model.toJSON());
+            var text = Mustache.render('{{ comment }} #{{ project }}/{{ task }}', this.model.toJSON());
             var data = {
                 "type": "https://tent.io/types/post/status/v0.1.0",
                 "published_at": timestamp,
@@ -103,8 +103,8 @@ define([
             var $field = $(evt.target),
                 val = $field.val(),
                 name = $field.attr('name');
-                
-            this.model.set({name: val});
+
+            this.model.set(name, val);
         },
         getProjects: function () {
             return _.without(_.keys(this.allPosts.groupBy('project')), 'null');
