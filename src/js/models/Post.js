@@ -14,7 +14,7 @@ define(['backbone'], function (Backbone){
             comment: null,
             published_at: null
         },
-        taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
+        taskPattern: /\#([\w_\d]+)\/([\w_\d\-]+)/,
         statusPattern: /\#(open|assign|close)/i,
         labelPattern: /\#([\w_\d]+)/gi,
         parse: function (post) {
