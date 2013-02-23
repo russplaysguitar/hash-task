@@ -49,6 +49,8 @@ define([
                 this.$('.task').change(function () {
                     self.model.set('task', $(this).val());
                 });
+
+                this.$el.show();
             }
             else {
                 this.$el.hide();
