@@ -7,7 +7,7 @@ define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostMod
     return Backbone.Collection.extend({
         model: PostModel,
         comparator: function (post) {
-            return -post.get('published_at');
+            return -post.attributes.published_at;
         },
         initialize: function (options) {
             this.on('reset', function (collection) {
