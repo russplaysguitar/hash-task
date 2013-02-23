@@ -11,9 +11,7 @@ define(['backbone'], function (Backbone){
             task: null,
             status: null,
             labels: [],
-            content: {
-                text: null
-            },
+            comment: null,
             published_at: null
         },
         taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
@@ -25,6 +23,7 @@ define(['backbone'], function (Backbone){
                 project = taskMatches ? taskMatches[1] : null,
                 task = taskMatches ? taskMatches[2]: null;
 
+            post.comment = text;
             post.project = project;
             post.task = task;
 

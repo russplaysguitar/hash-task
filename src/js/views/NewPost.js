@@ -17,7 +17,9 @@ define([
         className: '',
         events: {
             'click .btn': 'newPost',
-            'change .project': 'updateTaskNameField'
+            'change .project': 'updateTaskNameField',
+            'change input': 'updateModel',
+            'change textarea': 'updateModel'
         },
         initialize: function (options) {
             this.allPosts = options.allPosts;
@@ -35,17 +37,6 @@ define([
                 // set up typeahead
                 this.$('.project').typeahead({source: _.bind(this.getProjects, this)});
                 this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
-                         
-                // setup model/field bindings
-                this.$('.comment').change(function () {
-                    self.model.set('content', {text: $(this).val()});
-                });
-                this.$('.project').change(function () {
-                    self.model.set('project', $(this).val());
-                });
-                this.$('.task').change(function () {
-                    self.model.set('task', $(this).val());
-                });
 
                 this.alreadyRendered = true;
             }
@@ -107,6 +98,13 @@ define([
                 this.$('.task').val('');
                 this.$('.task').attr('disabled', 'disabled');
             }
+        },
+        updateModel: function (evt) {
+            var $field = $(evt.target),
+                val = $field.val(),
+                name = $field.attr('name');
+                
+            this.model.set({name: val});
         },
         getProjects: function () {
             return _.without(_.keys(this.allPosts.groupBy('project')), 'null');
