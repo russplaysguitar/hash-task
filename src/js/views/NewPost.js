@@ -16,7 +16,7 @@ define([
         tagName: 'div',
         className: '',
         events: {
-            'click .btn': 'newPost',
+            'click .doPost': 'newPost',
             'change .project': 'updateTaskNameField',
             'change input': 'updateModel',
             'change textarea': 'updateModel'

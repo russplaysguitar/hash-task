@@ -3,6 +3,17 @@
         <textarea class="comment" name="comment" placeholder="Comment" required>{{ comment }}</textarea><br />
         <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" value="{{ project }}">
         <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" disabled="disabled" value="{{ task }}">
-        <button type="button" class="btn btn-inverse">Post</button>
+        <div class="btn-group">
+            <button class="btn">Status</button>
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:;">Open</a></li>
+                <li><a href="javascript:;">Assign</a></li>
+                <li><a href="javascript:;">Close</a></li>
+            </ul>
+        </div><br />
+        <button type="button" class="doPost btn btn-inverse">Post</button>
     </div>
 </form>
