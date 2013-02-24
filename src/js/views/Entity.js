@@ -26,7 +26,6 @@ define([
                 $rendered.find('.logout').hide();
             }
             this.$el.html($rendered);
-            return this.$el;
         },
         setEntity: function (evt) {
             var entity = this.$('input').val();

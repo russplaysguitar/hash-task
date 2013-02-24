@@ -51,7 +51,6 @@ define([
             else if(!this.authModel.get('isLoggedIn') && this.$el.is(':visible')) {
                 this.$el.hide();
             }
-            return this.$el;
         },
         newPost: function (evt) {
             var self = this,

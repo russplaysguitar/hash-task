@@ -28,8 +28,6 @@ define([
             });
 
             this.$el.html(Mustache.render(ProjectsTemplate, {projectNames: projectNames}));
-
-            return this.$el;
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;

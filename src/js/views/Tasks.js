@@ -40,8 +40,6 @@ define([
                 tasksData.push(data);
             }, this);
             this.$el.html(Mustache.render(TasksTemplate, {tasks: tasksData}));
-
-            return this.$el;
         },
         showTask: function (evt) {
             var task = evt.currentTarget.hash;

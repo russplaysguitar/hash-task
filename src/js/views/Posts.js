@@ -36,8 +36,6 @@ define([
                 var postView = new PostView({model: post});
                 this.$el.append(postView.render());
             }, this);
-
-            return this.$el;
         }
     });
 });
