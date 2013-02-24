@@ -1,7 +1,9 @@
 /*global define*/
 
 // a list of tasks for a given project
-define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone, _, $, Mustache) {
+define([
+    'backbone', 'underscore', 'jquery', 'libs/mustache', 'utils/url', 'text!templates/tasks.html'
+], function (Backbone, _, $, Mustache, urlUtils, TasksTemplate) {
     'use strict';
     
     return Backbone.View.extend({
@@ -11,9 +13,9 @@ define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone
             'click .btn': 'showTask'
         },
         initialize: function (options) {
-            // options.collection.on('change', function () { 
-            //     this.render();
-            // }, this);
+            options.collection.on('change', function () { 
+                this.render();
+            }, this);
         },
         render: function (project) {
             project = project ? project : null;
@@ -28,16 +30,16 @@ define(['backbone', 'underscore', 'jquery', 'libs/mustache'], function (Backbone
                 return post.get('task'); })), 'null');
 
             // update DOM
-            this.$el.html('');
-            var template = '<a href="{{ location }}" class="btn btn-success">{{ task }}</a> ';
             var locParts = document.location.hash.split('/');
+            var tasksData = [];
+            var currentTask = urlUtils.getTask();
             _.each(tasks, function (task) {
                 locParts[1] = task;
-                var data = {location: locParts.join('/'), task: task};
-                this.$el.append(Mustache.render(template, data));
+                var active = task === currentTask ? 'active' : '';
+                var data = {location: locParts.join('/'), task: task, active: active};
+                tasksData.push(data);
             }, this);
-
-            return this.$el;
+            this.$el.html(Mustache.render(TasksTemplate, {tasks: tasksData}));
         },
         showTask: function (evt) {
             var task = evt.currentTarget.hash;

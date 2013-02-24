@@ -11,36 +11,22 @@ define([
     'views/Post',
     'views/Posts',
     'views/Projects',
-    'views/NewTask',
+    'views/NewPost',
     'views/Entity',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewTaskView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
         routes: {
-            '': 'home',
-            ':project': 'project',
-            ':project/:task': 'task'
+            '': 'everything',
+            ':project': 'everything',
+            ':project/:task': 'everything'
         },
-        home: function () {
+        everything: function (project, task) {
             entityView.render();
-            newTaskView.render();
-            projectsView.render();
-            tasksView.render();
-            postsView.render();
-        },
-        project: function (project) {
-            entityView.render();
-            newTaskView.render();
-            projectsView.render();
-            tasksView.render(project);
-            postsView.render(project);
-        },
-        task: function (project, task) {
-            entityView.render();
-            newTaskView.render();
+            newPostView.render();
             projectsView.render();
             tasksView.render(project);
             postsView.render(project, task);
@@ -48,11 +34,21 @@ define([
     });
     var router = new Router();
 
+    var pendingFetchCounter = new Backbone.Model({count: 0});
+    var updatePFCount = function (toAdd) {
+        var current = pendingFetchCounter.get('count');
+        pendingFetchCounter.set('count', current+toAdd);
+    };
+    pendingFetchCounter.on('change:count', function (newModel) {
+        if (newModel.get('count') === 0) {
+            Backbone.history.loadUrl(Backbone.history.fragment);
+        }
+    });
+
     // all the posts are put into this collection
     var allPostsCollection = new PostCollection();
     allPostsCollection.on('add', function () {
-        // refresh page when new posts are added to the collection
-        Backbone.history.loadUrl(Backbone.history.fragment);
+        updatePFCount(-1);
     });
 
     // just posts from the chosen entity
@@ -72,6 +68,7 @@ define([
             followingPosts.on('reset', function (fpCollection) {
                 allPostsCollection.add(fpCollection.models);
             });
+            updatePFCount(1);
             followingPosts.fetch();
         });        
     });
@@ -90,9 +87,14 @@ define([
 
     var authModel = new AuthenticationModel();
 
-    var newTaskView = new NewTaskView({
-        el: $('.newTask'),
-        model: authModel
+    var newPostView = new NewPostView({
+        el: $('.newPost'),
+        authModel: authModel,
+        allPosts: allPostsCollection
+    });
+    newPostView.on('posted', function () {
+        selfPostsCollection.fetch();
+        updatePFCount(1);
     });
 
     var entityView = new EntityView({
@@ -120,9 +122,11 @@ define([
             // lookup posts now
             followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
+            updatePFCount(1);
 
             selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
+            updatePFCount(1);
         }
     };
 });

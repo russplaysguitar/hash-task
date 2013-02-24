@@ -10,9 +10,11 @@ define(['backbone'], function (Backbone){
             project: null,
             task: null,
             status: null,
-            labels: []
+            labels: [],
+            comment: null,
+            published_at: null
         },
-        taskPattern: /\#([\w_\d]+)\/([\w_\d]+)/,
+        taskPattern: /\#([\w_\d]+)\/([\w_\d\-]+)/,
         statusPattern: /\#(open|assign|close)/i,
         labelPattern: /\#([\w_\d]+)/gi,
         parse: function (post) {
@@ -21,6 +23,7 @@ define(['backbone'], function (Backbone){
                 project = taskMatches ? taskMatches[1] : null,
                 task = taskMatches ? taskMatches[2]: null;
 
+            post.comment = text;
             post.project = project;
             post.task = task;
 

@@ -6,6 +6,9 @@ define(['backbone', 'underscore', 'models/Post'], function (Backbone, _, PostMod
     
     return Backbone.Collection.extend({
         model: PostModel,
+        comparator: function (post) {
+            return -post.attributes.published_at;
+        },
         initialize: function (options) {
             this.on('reset', function (collection) {
                 // find labels that reference projects (for posts without explicit project references)
