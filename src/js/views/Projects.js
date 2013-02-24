@@ -13,9 +13,9 @@ define([
             'click .btn': 'showProject'
         },
         initialize: function (options) {
-            // options.collection.on('change', function () { 
-            //     this.render();
-            // }, this);
+            options.collection.on('change', function () { 
+                this.render();
+            }, this);
         },
         render: function () {
             var currentProject = urlUtils.getProject();

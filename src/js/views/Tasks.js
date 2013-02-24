@@ -13,9 +13,9 @@ define([
             'click .btn': 'showTask'
         },
         initialize: function (options) {
-            // options.collection.on('change', function () { 
-            //     this.render();
-            // }, this);
+            options.collection.on('change', function () { 
+                this.render();
+            }, this);
         },
         render: function (project) {
             project = project ? project : null;
