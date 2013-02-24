@@ -48,6 +48,7 @@ define([
             // prepare field typeaheads
             this.$('.project').typeahead({source: _.bind(this.getProjects, this)});
             this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
+            this.$('.assignee').typeahead({source: _.bind(this.getFollowees, this)});
 
             // ensure select field is set
             this.$('.status').val(this.model.get('status'));
@@ -60,7 +61,8 @@ define([
                 task = this.model.get('task'),
                 project = this.model.get('project'),
                 status = this.model.get('status'),
-                comment = this.model.get('comment');
+                comment = this.model.get('comment'),
+                assignee = this.model.get('assignee');
 
             // prepare request string for hmac signature
             var request = {
@@ -72,10 +74,12 @@ define([
             var projectText = _.size(project) ? '#' + project : '';
             var taskText = _.size(task) ? '/' + task : '';
             var statusText = _.size(status) ? '#' + status.toLowerCase() : '';
+            var assignText = _.size(assignee) ? '#assign ^' + assignee : '';
             var text = comment + ' ' +
                        projectText + 
                        taskText + ' ' +
-                       statusText;
+                       statusText + ' ' +
+                       assignText;
 
             var data = {
                 "type": "https://tent.io/types/post/status/v0.1.0",
@@ -95,6 +99,7 @@ define([
             app_auth(this.authModel).auth_ajax(request, data, function () {
                 // on success...
                 self.model.clear();
+                self.render();
                 self.trigger('posted');
             });
         },
@@ -132,6 +137,9 @@ define([
                 return post.get('task');
             }));
             return _.without(tasks, 'null');
+        },
+        getFollowees: function () {
+            return _.keys(this.allPosts.groupBy('user'));
         }
     });
 });

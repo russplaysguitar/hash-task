@@ -13,8 +13,8 @@
     <div class="control-group">
         <label class="control-label">Project and Task:</label>
         <div class="controls">
-            <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" data-provide="typeahead" data-source="{{ projectList }}" value="{{ project }}">
-            <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" data-provide="typeahead" data-source="{{ taskList }}" {{ task-disabled }} value="{{ task }}">
+            <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" value="{{ project }}">
+            <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" value="{{ task }}">
         </div>
     </div>
     <div class="control-group">
@@ -25,6 +25,12 @@
                 <option value="open">Open</option>
                 <option value="close">Close</option>
             </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Assign:</label>
+        <div class="controls">
+            <input class="assignee" name="assignee" type="text" placeholder="Tent User" autocomplete="off" value="{{ assignee }}">
         </div>
     </div>
     <div class="control-group">
