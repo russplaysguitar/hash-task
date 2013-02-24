@@ -1,19 +1,35 @@
-<form action="javascript:;" class="form-horizontal {{ visibility }}">
+<form action="javascript:;" class="newPostForm form-horizontal {{ visibility }}">
     <div class="control-group">
-        <textarea class="comment" name="comment" placeholder="Comment" required>{{ comment }}</textarea><br />
-        <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" data-provide="typeahead" data-source="{{ projectList }}" value="{{ project }}">
-        <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" data-provide="typeahead" data-source="{{ taskList }}" {{ task-disabled }} value="{{ task }}">
-        <div class="statusDropDown btn-group">
-            <button class="status btn">Status</button>
-            <button class="btn dropdown-toggle" data-toggle="dropdown">
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="javascript:;">Open</a></li>
-                <li><a href="javascript:;">Assign</a></li>
-                <li><a href="javascript:;">Close</a></li>
-            </ul>
-        </div><br />
-        <button type="button" class="doPost btn btn-inverse">Post</button>
+        <div class="controls">
+            <h3 style="margin:0px;">Post a new task</h3>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Comment:</label>
+        <div class="controls">
+            <textarea class="comment" name="comment" placeholder="Comment" required>{{ comment }}</textarea><br />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Project and Task:</label>
+        <div class="controls">
+            <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" data-provide="typeahead" data-source="{{ projectList }}" value="{{ project }}">
+            <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" data-provide="typeahead" data-source="{{ taskList }}" {{ task-disabled }} value="{{ task }}">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Status:</label>
+        <div class="controls">
+            <select name="status" class="status">
+                <option value=""></option>
+                <option value="open">Open</option>
+                <option value="close">Close</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" class="doPost btn btn-inverse" value="Post">
+        </div>
     </div>
 </form>

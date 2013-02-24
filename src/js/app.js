@@ -34,12 +34,21 @@ define([
     });
     var router = new Router();
 
+    var pendingFetchCounter = new Backbone.Model({count: 0});
+    var updatePFCount = function (toAdd) {
+        var current = pendingFetchCounter.get('count');
+        pendingFetchCounter.set('count', current+toAdd);
+    };
+    pendingFetchCounter.on('change:count', function (newModel) {
+        if (newModel.get('count') === 0) {
+            Backbone.history.loadUrl(Backbone.history.fragment);
+        }
+    });
+
     // all the posts are put into this collection
     var allPostsCollection = new PostCollection();
     allPostsCollection.on('add', function () {
-        // refresh page when new posts are added to the collection
-        // TODO: make this happen only once
-        Backbone.history.loadUrl(Backbone.history.fragment);
+        updatePFCount(-1);
     });
 
     // just posts from the chosen entity
@@ -59,6 +68,7 @@ define([
             followingPosts.on('reset', function (fpCollection) {
                 allPostsCollection.add(fpCollection.models);
             });
+            updatePFCount(1);
             followingPosts.fetch();
         });        
     });
@@ -84,6 +94,7 @@ define([
     });
     newPostView.on('posted', function () {
         selfPostsCollection.fetch();
+        updatePFCount(1);
     });
 
     var entityView = new EntityView({
@@ -111,9 +122,11 @@ define([
             // lookup posts now
             followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
+            updatePFCount(1);
 
             selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
+            updatePFCount(1);
         }
     };
 });

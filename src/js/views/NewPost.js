@@ -16,21 +16,20 @@ define([
         tagName: 'div',
         className: '',
         events: {
-            'click .doPost': 'newPost',
+            'submit .newPostForm': 'newPost',
             'change .project': 'updateTaskDisabledness',
             'change input': 'updateModel',
-            'change textarea': 'updateModel'
+            'change textarea': 'updateModel',
+            'change select': 'updateModel'
         },
         initialize: function (options) {
             this.allPosts = options.allPosts;
             this.authModel = options.authModel;
             this.model = new PostModel();
-            this.model.bind('change', this.render, this);
+            // this.model.bind('change', this.render, this);
         },
         render: function () {
             var self = this;
-
-            this.updateTaskDisabledness();
 
             // hide or show depending on logged in status      
             if (this.authModel.get('isLoggedIn') && !this.$el.is(':visible')) {
@@ -40,18 +39,28 @@ define([
                 this.model.set('visibility', 'hidden');
             }
 
-            // set up typeahead
-            this.model.set('projectList', JSON.stringify(this.getProjects()));
-            this.model.set('taskList', JSON.stringify(this.getProjectTasks()));
-
+            // do render
             var rendered = Mustache.render(NewPostTemplate, this.model.toJSON());
             this.$el.html(rendered);
+
+            this.updateTaskDisabledness();
+
+            // prepare field typeaheads
+            this.$('.project').typeahead({source: _.bind(this.getProjects, this)});
+            this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
+
+            // ensure select field is set
+            this.$('.status').val(this.model.get('status'));
         },
         newPost: function (evt) {
             var self = this,
                 date = new Date(),
                 timestamp = parseInt((date * 1) / 1000, 10),
-                AppJSON = JSON.parse(localStorage.AppJSON);
+                AppJSON = JSON.parse(localStorage.AppJSON),
+                task = this.model.get('task'),
+                project = this.model.get('project'),
+                status = this.model.get('status'),
+                comment = this.model.get('comment');
 
             // prepare request string for hmac signature
             var request = {
@@ -59,7 +68,15 @@ define([
                 path: '/tent/posts'
             };
 
-            var text = Mustache.render('{{ comment }} #{{ project }}/{{ task }}', this.model.toJSON());
+            // build content text string
+            var projectText = _.size(project) ? '#' + project : '';
+            var taskText = _.size(task) ? '/' + task : '';
+            var statusText = _.size(status) ? '#' + status.toLowerCase() : '';
+            var text = comment + ' ' +
+                       projectText + 
+                       taskText + ' ' +
+                       statusText;
+
             var data = {
                 "type": "https://tent.io/types/post/status/v0.1.0",
                 "published_at": timestamp,
@@ -81,22 +98,23 @@ define([
                 self.trigger('posted');
             });
         },
-        updateTaskDisabledness: function (evt) {
-            var projectName = this.model.get('project'),
-                isDisabled = !!this.model.get('task-disabled');
+        updateTaskDisabledness: function () {
+            var projectName = this.$('.project').val(),
+                isDisabled = this.$('.task').attr('disabled') === 'disabled';
 
             if (_.size(projectName) > 0 && isDisabled) {
-                this.model.set('task-disabled', '');
+                this.$('.task').removeAttr('disabled');
             }
             else if (_.size(projectName) === 0 && !isDisabled) {
                 this.model.set('task', '');
-                this.model.set('task-disabled', 'disabled');
+                this.$('.task').attr('disabled', 'disabled');
             }
         },
         updateModel: function (evt) {
             var $field = $(evt.target),
                 val = $field.val(),
-                name = $field.attr('name');
+                name = $field.attr('name'),
+                className = $field.attr('class');
 
             this.model.set(name, val);
         },
