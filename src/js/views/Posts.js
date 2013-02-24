@@ -31,7 +31,7 @@ define([
             }
 
             // update DOM
-            this.$el.html('');
+            this.$el.html('<h4>Task Activity</h4>');
             _.each(posts, function (post) {
                 var postView = new PostView({model: post});
                 this.$el.append(postView.render());
