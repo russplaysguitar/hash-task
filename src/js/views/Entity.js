@@ -12,20 +12,21 @@ define([
             'click .login': 'setEntity',
             'click .logout': 'unsetEntity'
         },
+        initialize: function (options) {
+            this.model.on('change', this.render, this);
+        },
         render: function () {
             var isLoggedIn = this.model.get('isLoggedIn');
-            // update DOM
-            var rendered = Mustache.render(entityTemplate, this.model.toJSON());
-            var $rendered = $(rendered);
             if (isLoggedIn) {
-                $rendered.find('.login').hide();
-                $rendered.find('.logout').show();
+                this.model.set('loginVisible', 'hidden');
+                this.model.set('logoutVisible', '');
             }
             else {
-                $rendered.find('.login').show();
-                $rendered.find('.logout').hide();
+                this.model.set('loginVisible', '');
+                this.model.set('logoutVisible', 'hidden');
             }
-            this.$el.html($rendered);
+            var rendered = Mustache.render(entityTemplate, this.model.toJSON());
+            this.$el.html(rendered);
         },
         setEntity: function (evt) {
             var entity = this.$('input').val();

@@ -17,7 +17,7 @@ define([
         className: '',
         events: {
             'click .doPost': 'newPost',
-            'change .project': 'updateTaskNameField',
+            'change .project': 'updateTaskDisabledness',
             'change input': 'updateModel',
             'change textarea': 'updateModel'
         },
@@ -25,32 +25,27 @@ define([
             this.allPosts = options.allPosts;
             this.authModel = options.authModel;
             this.model = new PostModel();
+            this.model.bind('change', this.render, this);
         },
         render: function () {
             var self = this;
 
-            if (!this.alreadyRendered) {
-                // update DOM
-                var rendered = Mustache.render(NewPostTemplate, this.model.toJSON());
-                this.$el.html(rendered);
-
-                // set up typeahead
-                this.$('.project').typeahead({source: _.bind(this.getProjects, this)});
-                this.$('.task').typeahead({source: _.bind(this.getProjectTasks, this)});
-
-                this.alreadyRendered = true;
-            }
-
-            // update taskName field disabledness
-            this.updateTaskNameField();
+            this.updateTaskDisabledness();
 
             // hide or show depending on logged in status      
             if (this.authModel.get('isLoggedIn') && !this.$el.is(':visible')) {
-                this.$el.show();
+                this.model.set('visibility', '');
             }
             else if(!this.authModel.get('isLoggedIn') && this.$el.is(':visible')) {
-                this.$el.hide();
+                this.model.set('visibility', 'hidden');
             }
+
+            // set up typeahead
+            this.model.set('projectList', JSON.stringify(this.getProjects()));
+            this.model.set('taskList', JSON.stringify(this.getProjectTasks()));
+
+            var rendered = Mustache.render(NewPostTemplate, this.model.toJSON());
+            this.$el.html(rendered);
         },
         newPost: function (evt) {
             var self = this,
@@ -86,16 +81,16 @@ define([
                 self.trigger('posted');
             });
         },
-        updateTaskNameField: function (evt) {
-            var projectName = this.$('.project').val(),
-                isDisabled = !!this.$('.task').attr('disabled');
+        updateTaskDisabledness: function (evt) {
+            var projectName = this.model.get('project'),
+                isDisabled = !!this.model.get('task-disabled');
 
-            if (projectName.length > 0 && isDisabled) {
-                this.$('.task').removeAttr('disabled');
+            if (_.size(projectName) > 0 && isDisabled) {
+                this.model.set('task-disabled', '');
             }
-            else if (projectName.length === 0 && !isDisabled) {
-                this.$('.task').val('');
-                this.$('.task').attr('disabled', 'disabled');
+            else if (_.size(projectName) === 0 && !isDisabled) {
+                this.model.set('task', '');
+                this.model.set('task-disabled', 'disabled');
             }
         },
         updateModel: function (evt) {
@@ -111,7 +106,7 @@ define([
         getProjectTasks: function () {
             // TODO: implement some sort of caching, since this is called on each tasks field keypress
             //       (maybe break this View up into multiple views that share models?)
-            var projectName = this.$('.project').val();
+            var projectName = this.model.get('project');
             var postsForProject = this.allPosts.filter(function (post) {
                 return post.get('project') === projectName;
             });

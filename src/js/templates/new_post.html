@@ -1,10 +1,10 @@
-<form action="javascript:;" class="form-horizontal">
+<form action="javascript:;" class="form-horizontal {{ visibility }}">
     <div class="control-group">
         <textarea class="comment" name="comment" placeholder="Comment" required>{{ comment }}</textarea><br />
-        <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" value="{{ project }}">
-        <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" disabled="disabled" value="{{ task }}">
-        <div class="btn-group">
-            <button class="btn">Status</button>
+        <input class="project" name="project" type="text" placeholder="Project Name" autocomplete="off" data-provide="typeahead" data-source="{{ projectList }}" value="{{ project }}">
+        <input class="task" name="task" type="text" placeholder="Task Name" autocomplete="off" data-provide="typeahead" data-source="{{ taskList }}" {{ task-disabled }} value="{{ task }}">
+        <div class="statusDropDown btn-group">
+            <button class="status btn">Status</button>
             <button class="btn dropdown-toggle" data-toggle="dropdown">
                 <span class="caret"></span>
             </button>

@@ -5,3 +5,7 @@
 .newPost textarea {
     width: 524px;
 }
+
+.hidden {
+    display: none !important;
+}

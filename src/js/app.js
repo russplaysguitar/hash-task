@@ -38,6 +38,7 @@ define([
     var allPostsCollection = new PostCollection();
     allPostsCollection.on('add', function () {
         // refresh page when new posts are added to the collection
+        // TODO: make this happen only once
         Backbone.history.loadUrl(Backbone.history.fragment);
     });
 
