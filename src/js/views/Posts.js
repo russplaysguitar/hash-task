@@ -36,6 +36,14 @@ define([
                 var postView = new PostView({model: post});
                 this.$el.append(postView.render());
             }, this);
+
+            // hide or show the element
+            if (_.size(posts) && this.$el.is(':hidden')) {
+                this.$el.show();
+            }
+            else if (!_.size(posts) && this.$el.is(':visible')){
+                this.$el.hide();
+            }
         }
     });
 });

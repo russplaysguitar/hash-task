@@ -28,6 +28,14 @@ define([
             });
 
             this.$el.html(Mustache.render(ProjectsTemplate, {projectNames: projectNames}));
+
+            // hide or show the element
+            if (_.size(projectNames) && this.$el.is(':hidden')) {
+                this.$el.show();
+            }
+            else if (!_.size(projectNames) && this.$el.is(':visible')){
+                this.$el.hide();
+            }
         },
         showProject: function (evt) {
             var project = evt.currentTarget.hash;
