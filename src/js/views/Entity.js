@@ -30,7 +30,7 @@ define([
         },
         setEntity: function (evt) {
             var entity = this.$('input').val();
-            this.model.set('entity', entity);
+            this.model.set('entity', entity, {silent: true});
             if (entity && entity !== '') {
                 app_auth(this.model).auth(entity + '/tent');
             }
