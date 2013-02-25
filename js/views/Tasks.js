@@ -40,6 +40,14 @@ define([
                 tasksData.push(data);
             }, this);
             this.$el.html(Mustache.render(TasksTemplate, {tasks: tasksData}));
+
+            // hide or show the element
+            if (_.size(tasks) && this.$el.is(':hidden')) {
+                this.$el.show();
+            }
+            else if (!_.size(tasks) && this.$el.is(':visible')){
+                this.$el.hide();
+            }
         },
         showTask: function (evt) {
             var task = evt.currentTarget.hash;
