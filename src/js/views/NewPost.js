@@ -6,7 +6,7 @@ define([
     'jquery', 
     'libs/mustache', 
     'app_auth', 
-    'libs/bootstrap', 
+    'bootstrap', 
     'text!templates/new_post.html',
     'models/Post'
 ], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate, PostModel) {
