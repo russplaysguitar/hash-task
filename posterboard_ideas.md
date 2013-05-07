@@ -21,5 +21,4 @@ Application is run entirely on the client-side (in browser). Task data is pushed
     - Mustache
     - Underscore
     - jQuery
-    - Moment
     - Stanford JS Crypto Lib (SJCL)
