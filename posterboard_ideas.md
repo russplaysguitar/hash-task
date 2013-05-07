@@ -13,6 +13,7 @@ Application is run entirely on the client-side (in browser). Task data is pushed
 ## Languages/Frameworks
 
 - HTML/CSS
+    - HTML5
     - Bootstrap
 - JavaScript
     - Require
