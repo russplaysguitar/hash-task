@@ -10,7 +10,8 @@ define([
         className: '',
         events: {
             'click .login': 'setEntity',
-            'click .logout': 'unsetEntity'
+            'click .logout': 'unsetEntity',
+            'submit .loginForm': 'setEntity'
         },
         initialize: function (options) {
             this.model.on('change', this.render, this);
