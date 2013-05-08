@@ -25,13 +25,16 @@ define([
 
             if (task) {
                 // get posts for task
+                this.$el.html('<h4>Task Activity</h4>');
                 posts = _.filter(posts, function (post) {
                     return task && post.get('task') === task;
                 });
             }
+            else {
+                this.$el.html('<h4>Project Activity</h4>');
+            }
 
             // update DOM
-            this.$el.html('<h4>Task Activity</h4>');
             _.each(posts, function (post) {
                 var postView = new PostView({model: post});
                 this.$el.append(postView.render());
