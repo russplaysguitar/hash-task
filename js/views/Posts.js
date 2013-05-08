@@ -15,7 +15,7 @@ define([
             }, this);
         },
         render: function (project, task, status) {
-            var posts = this.collection.filter(function (post) { return true; }),
+            var posts = this.collection.models,
                 headingText = 'All Activity';
 
             project = project || null;
