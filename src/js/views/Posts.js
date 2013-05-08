@@ -14,21 +14,29 @@ define([
                 this.render();
             }, this);
         },
-        render: function (project, task) {
+        render: function (project, task, status) {
             project = project || null;
             task = task || null;
+            status = status || null;
 
             // get posts for project
             var posts = this.collection.filter(function (post) {
                 return project && post.get('project') === project;
             });
 
+            if (status) {
+                // filter posts by status
+                posts = _.filter(posts, function (post) {
+                    return post.get('status') === status;
+                });
+            }
+
             if (task) {
                 // get posts for task
-                this.$el.html('<h4>Task Activity</h4>');
                 posts = _.filter(posts, function (post) {
-                    return task && post.get('task') === task;
+                    return post.get('task') === task;
                 });
+                this.$el.html('<h4>Issue Activity</h4>');
             }
             else {
                 this.$el.html('<h4>Project Activity</h4>');

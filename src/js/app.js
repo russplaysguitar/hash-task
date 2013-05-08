@@ -22,17 +22,20 @@ define([
 
     var Router = Backbone.Router.extend({
         routes: {
-            '': 'everything',
-            ':project': 'everything',
-            ':project/:task': 'everything'
+            '*path': 'handleAnyRoute'
         },
-        everything: function (project, task) {
+        handleAnyRoute: function (path) {
+            var project = urlUtils.getProject(),
+                task = urlUtils.getTask(),
+                status = urlUtils.getStatus();
+                
             entityView.render();
             newPostView.render();
             projectsView.render();
             statusTogglerView.render();
             tasksView.render(project);
             postsView.render(project, task);
+            postsView.render(project, task, status);
         }
     });
     var router = new Router();
@@ -110,6 +113,12 @@ define([
     var statusTogglerView = new StatusToggerView({
         el: $('.statusToggler'),
         model: new Backbone.Model()
+    });
+    statusTogglerView.on('statusClicked', function (status) {
+        var locParts = document.location.hash.split('/');
+        locParts[2] = status;
+        var location = locParts.join('/');
+        router.navigate(location, {trigger:true});
     });
 
     // this is what is run by main.js
