@@ -14,9 +14,10 @@ define([
     'views/NewPost',
     'views/Entity',
     'views/Welcome',
+    'views/StatusToggler',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,WelcomeView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,WelcomeView,StatusToggerView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -29,6 +30,7 @@ define([
             entityView.render();
             newPostView.render();
             projectsView.render();
+            statusTogglerView.render();
             tasksView.render(project);
             postsView.render(project, task);
         }
@@ -103,6 +105,11 @@ define([
     var entityView = new EntityView({
         el: $('.tentEntity'), 
         model: authModel
+    });
+
+    var statusTogglerView = new StatusToggerView({
+        el: $('.statusToggler'),
+        model: new Backbone.Model()
     });
 
     // this is what is run by main.js

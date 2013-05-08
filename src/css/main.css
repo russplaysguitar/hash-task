@@ -12,7 +12,7 @@
     text-align: center;
 }
 
-.tasksList, .projectsList {
+.tasksList, .projectsList, .statusToggler {
     margin-bottom: 10px;
 }
 
