@@ -40,7 +40,8 @@ define([
         },
         unsetEntity: function (evt) {
             this.model.clear();
-            document.location.reload();
+            document.location.hash = '';
+            document.location.reload(true);
         }
     });
 });
