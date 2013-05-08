@@ -20,10 +20,12 @@ define([
             if (isLoggedIn) {
                 this.model.set('loginVisible', 'hidden');
                 this.model.set('logoutVisible', '');
+                this.model.set('inputDisabled', 'disabled');
             }
             else {
                 this.model.set('loginVisible', '');
                 this.model.set('logoutVisible', 'hidden');
+                this.model.set('inputDisabled', '');
             }
             var rendered = Mustache.render(entityTemplate, this.model.toJSON());
             this.$el.html(rendered);

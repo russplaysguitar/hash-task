@@ -1,6 +1,6 @@
 <form action="javascript:;" class="form-inline">
     <div class="control-group">
-        <input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>
+        <input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required {{inputDisabled}}>
         <button type="button" class="login btn {{ loginVisible }}">Tent Log In</button>
         <button type="button" class="logout btn {{ logoutVisible }}">Log Out</button>
     </div>
