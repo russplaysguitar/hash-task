@@ -17,6 +17,8 @@ define([
         var urlState = urlUtils.getURLParameter('state'),
             savedState = authModel.get('AppState');
 
+        urlState = urlState.split('/')[0];// fix in case other url stuff is in urlState
+
         if (urlState !== savedState) {
             throw("CRSF warning");
         }
