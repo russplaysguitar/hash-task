@@ -35,32 +35,31 @@ define([
     });
     var router = new Router();
 
-    var pendingFetchCounter = new Backbone.Model({count: 0});
-    var updatePFCount = function (toAdd) {
-        var current = pendingFetchCounter.get('count');
-        pendingFetchCounter.set('count', current+toAdd);
-    };
-    pendingFetchCounter.on('change:count', function (newModel) {
-        if (newModel.get('count') === 0) {
+    var loadingMonitor = new Backbone.Model({
+        selfPostsDone: false,
+        followingPostsDone: false
+    });
+    loadingMonitor.on('change', function (newModel) {
+        if (newModel.get('selfPostsDone') === true && 
+            newModel.get('followingPostsDone') === true) {
             Backbone.history.loadUrl(Backbone.history.fragment);
         }
     });
 
     // all the posts are put into this collection
     var allPostsCollection = new PostCollection();
-    allPostsCollection.on('add', function () {
-        updatePFCount(-1);
-    });
 
     // just posts from the chosen entity
     var selfPostsCollection = new PostCollection();
     selfPostsCollection.on('reset', function (collection) {
         allPostsCollection.add(collection.models);
+        loadingMonitor.set('selfPostsDone', true);
     });
 
     // posts from entity followings
     var followingsCollection = new FollowingsCollection();
     followingsCollection.on('reset', function (collection) {
+        var waitingCount = collection.length;
         // fetch posts for each entity this user is following
         collection.each(function (following) {
             var entity = following.get('entity');
@@ -68,8 +67,11 @@ define([
             followingPosts.url = entity + '/tent/posts';
             followingPosts.on('reset', function (fpCollection) {
                 allPostsCollection.add(fpCollection.models);
+                waitingCount -= 1;
+                if (waitingCount === 0) {
+                    loadingMonitor.set('followingPostsDone', true);
+                }
             });
-            updatePFCount(1);
             followingPosts.fetch();
         });        
     });
@@ -94,8 +96,8 @@ define([
         allPosts: allPostsCollection
     });
     newPostView.on('posted', function () {
+        loadingMonitor.set('selfPostsDone', false);
         selfPostsCollection.fetch();
-        updatePFCount(1);
     });
 
     var entityView = new EntityView({
@@ -123,11 +125,9 @@ define([
             // lookup posts now
             followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
-            updatePFCount(1);
 
             selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
-            updatePFCount(1);
         }
         else {
             // show welcome screen
