@@ -11,10 +11,9 @@ define(['backbone', 'jquery', 'libs/mustache', 'text!templates/status_toggler.ht
         events: {
             'click button': 'statusClicked'
         },
-        initialize: function () {
-            // this.model.set('openActive', 'active');
+        initialize: function (options) {
         },
-        render: function () {
+        render: function (project) {
             // get currently selected status
             var status = urlUtils.getStatus();
 
@@ -42,7 +41,13 @@ define(['backbone', 'jquery', 'libs/mustache', 'text!templates/status_toggler.ht
 
             this.$el.html(Mustache.render(StatusTogglerTemplate, this.model.toJSON()));
 
-            return this.$el;
+            // hide or show the element
+            if (project && this.$el.is(':hidden')) {
+                this.$el.show();
+            }
+            else if (!project && this.$el.is(':visible')){
+                this.$el.hide();
+            }
         },
         statusClicked: function (evt) {
             var status = $(evt.currentTarget).text();

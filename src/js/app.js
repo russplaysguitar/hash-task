@@ -32,7 +32,7 @@ define([
             entityView.render();
             newPostView.render();
             projectsView.render();
-            statusTogglerView.render();
+            statusTogglerView.render(project);
             tasksView.render(project, status);
             postsView.render(project, task);
             postsView.render(project, task, status);
