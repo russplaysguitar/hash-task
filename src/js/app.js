@@ -112,7 +112,8 @@ define([
 
     var statusTogglerView = new StatusToggerView({
         el: $('.statusToggler'),
-        model: new Backbone.Model()
+        model: new Backbone.Model(),
+        collection: allPostsCollection
     });
     statusTogglerView.on('statusClicked', function (status) {
         var locParts = document.location.hash.split('/');

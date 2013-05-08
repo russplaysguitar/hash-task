@@ -1,8 +1,8 @@
 /*global define*/
 
 // the issue status toggler
-define(['backbone', 'jquery', 'libs/mustache', 'text!templates/status_toggler.html', 'utils/url'], 
-    function (Backbone, $, Mustache, StatusTogglerTemplate, urlUtils) {
+define(['backbone', 'jquery', 'underscore', 'libs/mustache', 'text!templates/status_toggler.html', 'utils/url'], 
+    function (Backbone, $, _, Mustache, StatusTogglerTemplate, urlUtils) {
     'use strict';
     
     return Backbone.View.extend({
@@ -12,8 +12,16 @@ define(['backbone', 'jquery', 'libs/mustache', 'text!templates/status_toggler.ht
             'click button': 'statusClicked'
         },
         initialize: function (options) {
+            options.collection.on('change', function () { 
+                this.render();
+            }, this);
         },
         render: function (project) {
+            // get posts for project
+            var posts = this.collection.filter(function (post) {
+                return post.get('project') === project;
+            });
+
             // get currently selected status
             var status = urlUtils.getStatus();
 
@@ -42,10 +50,10 @@ define(['backbone', 'jquery', 'libs/mustache', 'text!templates/status_toggler.ht
             this.$el.html(Mustache.render(StatusTogglerTemplate, this.model.toJSON()));
 
             // hide or show the element
-            if (project && this.$el.is(':hidden')) {
+            if (_.size(posts) && this.$el.is(':hidden')) {
                 this.$el.show();
             }
-            else if (!project && this.$el.is(':visible')){
+            else if (!_.size(posts) && this.$el.is(':visible')){
                 this.$el.hide();
             }
         },
