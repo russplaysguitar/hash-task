@@ -1,7 +1,8 @@
-<form action="javascript:;" class="form-inline">
+<form action="javascript:;" class="loginForm form-inline">
     <div class="control-group">
-        <input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required>
+        <input type="url" placeholder="https://yourname.tent.is" value="{{ entity }}" required {{inputDisabled}}>
         <button type="button" class="login btn {{ loginVisible }}">Tent Log In</button>
+        <div class="{{ loginVisible }}">(requires a <a href="https://tent.is/" target="_blank">Tent account</a>)</div>
         <button type="button" class="logout btn {{ logoutVisible }}">Log Out</button>
     </div>
 </form>

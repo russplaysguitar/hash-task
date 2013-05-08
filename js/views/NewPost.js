@@ -6,10 +6,11 @@ define([
     'jquery', 
     'libs/mustache', 
     'app_auth', 
-    'libs/bootstrap', 
+    'bootstrap', 
     'text!templates/new_post.html',
-    'models/Post'
-], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate, PostModel) {
+    'models/Post',
+    'utils/url'
+], function (Backbone, _, $, Mustache, app_auth, bootstrap, NewPostTemplate, PostModel, urlUtils) {
     'use strict';
     
     return Backbone.View.extend({
@@ -20,12 +21,13 @@ define([
             'change .project': 'updateTaskDisabledness',
             'change input': 'updateModel',
             'change textarea': 'updateModel',
-            'change select': 'updateModel'
+            'change select': 'updateModel',
+            'click .newPostBtn': 'toggleFormVisibility'
         },
         initialize: function (options) {
             this.allPosts = options.allPosts;
             this.authModel = options.authModel;
-            this.model = new PostModel();
+            this.model = new PostModel({ formVisibility: 'hidden' });
             // this.model.bind('change', this.render, this);
         },
         render: function () {
@@ -34,9 +36,11 @@ define([
             // hide or show depending on logged in status      
             if (this.authModel.get('isLoggedIn') && !this.$el.is(':visible')) {
                 this.model.set('visibility', '');
+                this.model.set('newPostBtnActive', 'active');
             }
             else if(!this.authModel.get('isLoggedIn') && this.$el.is(':visible')) {
                 this.model.set('visibility', 'hidden');
+                this.model.set('newPostBtnActive', '');
             }
 
             // do render
@@ -140,6 +144,19 @@ define([
         },
         getFollowees: function () {
             return _.keys(this.allPosts.groupBy('user'));
+        },
+        toggleFormVisibility: function () {
+            if (this.model.get('formVisibility') !== 'hidden') {
+                this.model.set('formVisibility', 'hidden');
+                this.model.set('newPostBtnActive', '');
+            }
+            else {
+                this.model.set('formVisibility', '');
+                this.model.set('newPostBtnActive', 'active');
+                this.model.set('project', urlUtils.getProject());
+                this.model.set('task', urlUtils.getTask());
+            }
+            this.render();
         }
     });
 });

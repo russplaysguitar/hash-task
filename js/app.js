@@ -13,53 +13,58 @@ define([
     'views/Projects',
     'views/NewPost',
     'views/Entity',
+    'views/Welcome',
+    'views/StatusToggler',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,WelcomeView,StatusToggerView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
         routes: {
-            '': 'everything',
-            ':project': 'everything',
-            ':project/:task': 'everything'
+            '*path': 'handleAnyRoute'
         },
-        everything: function (project, task) {
+        handleAnyRoute: function (path) {
+            var project = urlUtils.getProject(),
+                task = urlUtils.getTask(),
+                status = urlUtils.getStatus();
+
             entityView.render();
             newPostView.render();
             projectsView.render();
-            tasksView.render(project);
+            statusTogglerView.render(project);
+            tasksView.render(project, status);
             postsView.render(project, task);
+            postsView.render(project, task, status);
         }
     });
     var router = new Router();
 
-    var pendingFetchCounter = new Backbone.Model({count: 0});
-    var updatePFCount = function (toAdd) {
-        var current = pendingFetchCounter.get('count');
-        pendingFetchCounter.set('count', current+toAdd);
-    };
-    pendingFetchCounter.on('change:count', function (newModel) {
-        if (newModel.get('count') === 0) {
+    var loadingMonitor = new Backbone.Model({
+        selfPostsDone: false,
+        followingPostsDone: false
+    });
+    loadingMonitor.on('change', function (newModel) {
+        if (newModel.get('selfPostsDone') === true && 
+            newModel.get('followingPostsDone') === true) {
             Backbone.history.loadUrl(Backbone.history.fragment);
         }
     });
 
     // all the posts are put into this collection
     var allPostsCollection = new PostCollection();
-    allPostsCollection.on('add', function () {
-        updatePFCount(-1);
-    });
 
     // just posts from the chosen entity
     var selfPostsCollection = new PostCollection();
     selfPostsCollection.on('reset', function (collection) {
         allPostsCollection.add(collection.models);
+        loadingMonitor.set('selfPostsDone', true);
     });
 
     // posts from entity followings
     var followingsCollection = new FollowingsCollection();
     followingsCollection.on('reset', function (collection) {
+        var waitingCount = collection.length;
         // fetch posts for each entity this user is following
         collection.each(function (following) {
             var entity = following.get('entity');
@@ -67,8 +72,11 @@ define([
             followingPosts.url = entity + '/tent/posts';
             followingPosts.on('reset', function (fpCollection) {
                 allPostsCollection.add(fpCollection.models);
+                waitingCount -= 1;
+                if (waitingCount === 0) {
+                    loadingMonitor.set('followingPostsDone', true);
+                }
             });
-            updatePFCount(1);
             followingPosts.fetch();
         });        
     });
@@ -93,13 +101,25 @@ define([
         allPosts: allPostsCollection
     });
     newPostView.on('posted', function () {
+        loadingMonitor.set('selfPostsDone', false);
         selfPostsCollection.fetch();
-        updatePFCount(1);
     });
 
     var entityView = new EntityView({
         el: $('.tentEntity'), 
         model: authModel
+    });
+
+    var statusTogglerView = new StatusToggerView({
+        el: $('.statusToggler'),
+        model: new Backbone.Model(),
+        collection: allPostsCollection
+    });
+    statusTogglerView.on('statusClicked', function (status) {
+        var locParts = document.location.hash.split('/');
+        locParts[2] = status;
+        var location = locParts.join('/');
+        router.navigate(location, {trigger:true});
     });
 
     // this is what is run by main.js
@@ -122,11 +142,15 @@ define([
             // lookup posts now
             followingsCollection.url = authModel.get('entity') + '/tent/followings';
             followingsCollection.fetch();
-            updatePFCount(1);
 
             selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
-            updatePFCount(1);
+        }
+        else {
+            // show welcome screen
+            var welcomeView = new WelcomeView({
+                el: $('.welcome')
+            });
         }
     };
 });

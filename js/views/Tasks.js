@@ -17,7 +17,7 @@ define([
                 this.render();
             }, this);
         },
-        render: function (project) {
+        render: function (project, status) {
             project = project ? project : null;
 
             // get posts for project
@@ -25,9 +25,38 @@ define([
                 return post.get('project') === project;
             });
 
+            // group posts by task (includes null)
+            var taskGroups = _.groupBy(posts, function(post) {
+                return post.get('task');
+            });
+            
             // get tasks for project
-            var tasks = _.without(_.keys(_.groupBy(posts, function (post) {
-                return post.get('task'); })), 'null');
+            var tasks = _.without(_.keys(taskGroups), 'null');
+
+            if (status) {
+                // filter for tasks that match the status...
+
+                // build a map of task statuses
+                var taskStatuses = {};
+                _.each(taskGroups, function(posts, taskName) {
+                    var statusChangePosts = _.filter(posts, function(post) {
+                        var status = post.get('status');
+                        return status === 'open' || status === 'close';
+                    });
+                    var sorted = _.sortBy(statusChangePosts, function (post) {
+                        return post.get('published_at');
+                    });
+                    if (!sorted.length) { return; }// no posts
+                    var status = _.last(sorted).get('status');
+                    status = status === 'close' ? 'closed' : status;// fix status tense
+                    taskStatuses[taskName] = status;
+                });
+                
+                // now, filter tasks that match the status
+                tasks = _.filter(tasks, function (task) {
+                    return taskStatuses[task] === status;
+                });
+            }
 
             // update DOM
             var locParts = document.location.hash.split('/');

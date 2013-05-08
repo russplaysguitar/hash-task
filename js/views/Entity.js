@@ -10,7 +10,8 @@ define([
         className: '',
         events: {
             'click .login': 'setEntity',
-            'click .logout': 'unsetEntity'
+            'click .logout': 'unsetEntity',
+            'submit .loginForm': 'setEntity'
         },
         initialize: function (options) {
             this.model.on('change', this.render, this);
@@ -20,10 +21,12 @@ define([
             if (isLoggedIn) {
                 this.model.set('loginVisible', 'hidden');
                 this.model.set('logoutVisible', '');
+                this.model.set('inputDisabled', 'disabled');
             }
             else {
                 this.model.set('loginVisible', '');
                 this.model.set('logoutVisible', 'hidden');
+                this.model.set('inputDisabled', '');
             }
             var rendered = Mustache.render(entityTemplate, this.model.toJSON());
             this.$el.html(rendered);
@@ -37,7 +40,8 @@ define([
         },
         unsetEntity: function (evt) {
             this.model.clear();
-            document.location.reload();
+            document.location.hash = '';
+            document.location.reload(true);
         }
     });
 });

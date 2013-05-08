@@ -1,5 +1,23 @@
-.tasksList, .projectsList {
+.container {
+    background-color: white;
+    margin: 4px;
+    border: solid 1px gray;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 6px;
+}
+
+.footer {
+    border-top: solid 1px gray;
+    text-align: center;
+}
+
+.tasksList, .projectsList, .statusToggler, .newPost {
     margin-bottom: 10px;
+}
+
+.statusToggler {
+    float: right;
 }
 
 .newPost textarea {

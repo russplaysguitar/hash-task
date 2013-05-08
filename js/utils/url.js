@@ -24,6 +24,15 @@ define([], function () {
             }
             var task = splitUrl[1];
             return task;
+        },
+
+        getStatus: function () {
+            var splitUrl = location.hash.split('/');
+            if (splitUrl.length < 3) { 
+                return null;
+            }
+            var status = splitUrl[2];
+            return status;
         }
     };
 });

@@ -17,6 +17,8 @@ define([
         var urlState = urlUtils.getURLParameter('state'),
             savedState = authModel.get('AppState');
 
+        urlState = urlState.split('/')[0];// fix in case other url stuff is in urlState
+
         if (urlState !== savedState) {
             throw("CRSF warning");
         }
@@ -91,6 +93,9 @@ define([
                 authModel.set('profileUrl', profileUrl);
 
                 callback.apply(context, [profileUrl]);
+            },
+            error: function () {
+                alert('Oops, something went wrong. Are you using a valid Tent entity url? (Example: https://yourname.tent.is)');
             }
         });
     };
