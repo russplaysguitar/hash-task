@@ -13,9 +13,10 @@ define([
     'views/Projects',
     'views/NewPost',
     'views/Entity',
+    'views/Welcome',
     'utils/url',
     'collections/Followings'
-], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,urlUtils,FollowingsCollection) {
+], function (Backbone,_,$,app_auth,AuthenticationModel,PostCollection,TasksView,PostView,PostsView,ProjectsView,NewPostView,EntityView,WelcomeView,urlUtils,FollowingsCollection) {
     'use strict';
 
     var Router = Backbone.Router.extend({
@@ -127,6 +128,12 @@ define([
             selfPostsCollection.url = authModel.get('entity') + '/tent/posts';
             selfPostsCollection.fetch();
             updatePFCount(1);
+        }
+        else {
+            // show welcome screen
+            var welcomeView = new WelcomeView({
+                el: $('.welcome')
+            });
         }
     };
 });
