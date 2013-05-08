@@ -24,13 +24,6 @@ define([
                 return project && post.get('project') === project;
             });
 
-            if (status) {
-                // filter posts by status
-                posts = _.filter(posts, function (post) {
-                    return post.get('status') === status;
-                });
-            }
-
             if (task) {
                 // get posts for task
                 posts = _.filter(posts, function (post) {

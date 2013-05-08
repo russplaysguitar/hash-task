@@ -28,12 +28,12 @@ define([
             var project = urlUtils.getProject(),
                 task = urlUtils.getTask(),
                 status = urlUtils.getStatus();
-                
+
             entityView.render();
             newPostView.render();
             projectsView.render();
             statusTogglerView.render();
-            tasksView.render(project);
+            tasksView.render(project, status);
             postsView.render(project, task);
             postsView.render(project, task, status);
         }
