@@ -15,25 +15,30 @@ define([
             }, this);
         },
         render: function (project, task, status) {
+            var posts = this.collection.filter(function (post) { return true; }),
+                headingText = 'All Activity';
+
             project = project || null;
             task = task || null;
             status = status || null;
 
-            // get posts for project
-            var posts = this.collection.filter(function (post) {
-                return project && post.get('project') === project;
-            });
+            if (project) {
+                // filter posts for project
+                posts = this.collection.filter(function (post) {
+                    return project && post.get('project') === project;
+                });
+                headingText = 'Project Activity';
+            }
 
             if (task) {
-                // get posts for task
+                // filter posts for task
                 posts = _.filter(posts, function (post) {
                     return post.get('task') === task;
                 });
-                this.$el.html('<h4>Issue Activity</h4>');
+                headingText = 'Issue Activity';
             }
-            else {
-                this.$el.html('<h4>Project Activity</h4>');
-            }
+
+            this.$el.html('<h4>'+ headingText +'</h4>');
 
             // update DOM
             _.each(posts, function (post) {
