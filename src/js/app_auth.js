@@ -93,6 +93,9 @@ define([
                 authModel.set('profileUrl', profileUrl);
 
                 callback.apply(context, [profileUrl]);
+            },
+            error: function () {
+                alert('Oops, something went wrong. Are you using a valid Tent entity url? (Example: https://yourname.tent.is)');
             }
         });
     };
